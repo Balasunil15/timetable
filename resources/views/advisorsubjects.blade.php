@@ -591,10 +591,13 @@
             </div>
             <div class="modal-body">
                 <div class="row mb-3">
-                    <div class="col-md-3">
+                    <div class="col-md-2">
+                        <button class="btn btn-outline-primary w-100" onclick="selectAllStudents()">Select All</button>
+                    </div>
+                    <div class="col-md-2">
                         <button class="btn btn-outline-primary w-100" onclick="selectOddStudents()">Odd Students</button>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <button class="btn btn-outline-primary w-100" onclick="selectEvenStudents()">Even Students</button>
                     </div>
                     <div class="col-md-3">
@@ -650,6 +653,13 @@
 </div>
 
 <script>
+    function selectAllStudents() {
+        const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = true;
+        });
+    }
+
     function selectOddStudents() {
         const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
         checkboxes.forEach((checkbox, index) => {
