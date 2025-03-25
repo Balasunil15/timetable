@@ -94,23 +94,14 @@
             color: #224abe;
         }
 
-
-
         /* Table Styles */
-
-
-
         .gradient-header {
             --bs-table-bg: transparent;
             --bs-table-color: white;
             background: linear-gradient(135deg, #4CAF50, #2196F3) !important;
-
             text-align: center;
             font-size: 0.9em;
-
-
         }
-
 
         td {
             text-align: left;
@@ -118,11 +109,6 @@
             vertical-align: middle;
             /* For vertical alignment */
         }
-
-
-
-
-
 
         /* Responsive Styles */
         @media (max-width: 768px) {
@@ -202,7 +188,6 @@
         .container-fluid {
             padding: 20px;
         }
-
 
         /* loader */
         .loader-container {
@@ -304,19 +289,86 @@
 
         <!-- Content Area -->
         <div class="container-fluid">
-        <div class="custom-tabs">
-            <h2>Students List</h2>
-            <table id="facTable" class="table table-striped table-bordered">
-                <thead class="gradient-header">
-                    <tr>
-                        <th>Reg No</th>
-                        <th>Student Name</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    
-                </tbody>
-            </table></div>
+            <div class="custom-tabs">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="subjects-tab" data-bs-toggle="tab" data-bs-target="#subjects" type="button" role="tab" aria-controls="subjects" aria-selected="true">Select Subjects</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button" role="tab" aria-controls="students" aria-selected="false">Select Students</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="subjects" role="tabpanel" aria-labelledby="subjects-tab">
+                        <table id="subjectsTable" class="table table-bordered">
+                            <thead class="gradient-header">
+                                <tr>
+                                    <th>Subject Code</th>
+                                    <th>Subject Name</th>
+                                    <th>Credits</th>
+                                    <th>Select Faculty</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>SUB001</td>
+                                    <td>Mathematics</td>
+                                    <td>4</td>
+                                    <td class="text-center"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#facultyModal">Select Faculty</button></td>
+                                    <td class="text-center">
+                                        <button class="btn btn-success">Select</button>
+                                        <button class="btn btn-danger">Remove</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>SUB002</td>
+                                    <td>Physics</td>
+                                    <td>3</td>
+                                    <td class="text-center"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#facultyModal">Select Faculty</button></td>
+                                    <td class="text-center">
+                                        <button class="btn btn-success">Select</button>
+                                        <button class="btn btn-danger">Remove</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>SUB003</td>
+                                    <td>Chemistry</td>
+                                    <td>3</td>
+                                    <td class="text-center"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#facultyModal">Select Faculty</button></td>
+                                    <td class="text-center">
+                                        <button class="btn btn-success">Select</button>
+                                        <button class="btn btn-danger">Remove</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="students" role="tabpanel" aria-labelledby="students-tab">
+                        <table id="studentsTable" class="table table-bordered">
+                            <thead class="gradient-header">
+                                <tr>
+                                    <th>Subject Code</th>
+                                    <th>Subject Name</th>
+                                    <th>Select Students</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>SUB001</td>
+                                    <td>Mathematics</td>
+                                    <td class="text-center"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentsModal">Select Students</button></td>
+                                </tr>
+                                <tr>
+                                    <td>SUB002</td>
+                                    <td>Physics</td>
+                                    <td class="text-center"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentsModal">Select Students</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Footer -->
@@ -364,7 +416,10 @@
                 showError();
                 return false;
             };
-            $('#facTable').DataTable(); //datatable start
+
+            // Initialize DataTables for subjectsTable and studentsTable
+            $('#subjectsTable').DataTable();
+            $('#studentsTable').DataTable();
         });
 
         document.addEventListener("DOMContentLoaded", function () {
@@ -502,6 +557,130 @@
         });
     </script>
    
+<!-- Faculty Modal -->
+<div class="modal fade" id="facultyModal" tabindex="-1" aria-labelledby="facultyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="facultyModalLabel">Select Faculty</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                    <li class="list-group-item">Faculty 1</li>
+                    <li class="list-group-item">Faculty 2</li>
+                    <li class="list-group-item">Faculty 3</li>
+                    <!-- Add more faculty as needed -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Students Modal -->
+<div class="modal fade" id="studentsModal" tabindex="-1" aria-labelledby="studentsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="studentsModalLabel">Select Students</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-primary w-100" onclick="selectOddStudents()">Odd Students</button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-primary w-100" onclick="selectEvenStudents()">Even Students</button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-primary w-100" onclick="selectFirstHalfStudents()">1st Half Students</button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-primary w-100" onclick="selectSecondHalfStudents()">2nd Half Students</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <input type="checkbox" id="student1" name="student1">
+                                <label for="student1">Student 1 (ID: 001)</label>
+                            </li>
+                            <li class="list-group-item">
+                                <input type="checkbox" id="student2" name="student2">
+                                <label for="student2">Student 2 (ID: 002)</label>
+                            </li>
+                            <li class="list-group-item">
+                                <input type="checkbox" id="student3" name="student3">
+                                <label for="student3">Student 3 (ID: 003)</label>
+                            </li>
+                            <!-- Add more students as needed -->
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <input type="checkbox" id="student4" name="student4">
+                                <label for="student4">Student 4 (ID: 004)</label>
+                            </li>
+                            <li class="list-group-item">
+                                <input type="checkbox" id="student5" name="student5">
+                                <label for="student5">Student 5 (ID: 005)</label>
+                            </li>
+                            <li class="list-group-item">
+                                <input type="checkbox" id="student6" name="student6">
+                                <label for="student6">Student 6 (ID: 006)</label>
+                            </li>
+                            <!-- Add more students as needed -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function selectOddStudents() {
+        const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
+        checkboxes.forEach((checkbox, index) => {
+            checkbox.checked = (index % 2 === 0);
+        });
+    }
+
+    function selectEvenStudents() {
+        const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
+        checkboxes.forEach((checkbox, index) => {
+            checkbox.checked = (index % 2 !== 0);
+        });
+    }
+
+    function selectFirstHalfStudents() {
+        const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
+        const half = Math.ceil(checkboxes.length / 2);
+        checkboxes.forEach((checkbox, index) => {
+            checkbox.checked = (index < half);
+        });
+    }
+
+    function selectSecondHalfStudents() {
+        const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
+        const half = Math.ceil(checkboxes.length / 2);
+        checkboxes.forEach((checkbox, index) => {
+            checkbox.checked = (index >= half);
+        });
+    }
+</script>
+
 </body>
 
 </html>
