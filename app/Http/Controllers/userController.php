@@ -41,6 +41,7 @@ class userController extends Controller
                     if ($advisorRecord) {
                         // Store advisor details (batch, sec, semester) in session
                         session([
+                            'cid' => $advisorRecord->cid,
                             'batch' => $advisorRecord->batch,
                             'sec' => $advisorRecord->sec,
                             'semester' => $advisorRecord->semester
