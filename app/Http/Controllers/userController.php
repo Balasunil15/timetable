@@ -308,6 +308,9 @@ class userController extends Controller
 
     public function studentslist(Request $request)
     {
+        if (!session()->has('fid')) {
+            return redirect()->route('login');
+        }
         $dept = $request->session()->get('dept');
         $batch = $request->session()->get('batch');
         $sec = $request->session()->get('sec');
@@ -322,6 +325,13 @@ class userController extends Controller
             ->get();
 
         return view('students', compact('students'));
+    }
+
+    public function advisorsubjects(Request $request){
+        if (!session()->has('fid')) {
+            return redirect()->route('login');
+        }
+        return view('advisorsubjects');
     }
 
 }
