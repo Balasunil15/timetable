@@ -304,27 +304,25 @@
 
         <!-- Content Area -->
         <div class="container-fluid">
-                <div class="custom-tabs">
-                    <table id="facTable" class="table table-bordered">
-                        <thead class="gradient-header">
-                            <tr>
-                                <th>StudentId</th>
-                                <th>StudentName</th>
-                            </tr>
-                        </thead>
-                        <tbody class="align-middle text-center">
-                            @if(!empty($students) && is_array($students))
-                                @foreach($students as $student)
-                                    <tr>
-                                        <td>{{ $student->regno }}</td>
-                                        <td>{{ $student->studentName }}</td>
-                                    </tr>
-                                @endforeach
-                            @endif
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="custom-tabs">
+            <h2>Students List</h2>
+            <table id="facTable" class="table table-striped table-bordered">
+                <thead class="gradient-header">
+                    <tr>
+                        <th>Reg No</th>
+                        <th>Student Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($students as $student)
+                    <tr>
+                        <td>{{ $student->regno }}</td>
+                        <td>{{ $student->studentName }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table></div>
+        </div>
 
         <!-- Footer -->
         @include ('footer')
