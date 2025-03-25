@@ -12,7 +12,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-5/bootstrap-5.css" rel="stylesheet">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
@@ -332,7 +331,7 @@
                                 @php
                                     $advisorFound = null;
                                     foreach ($advisorRecords as $record) {
-                                        if ($record->year == $batch && $record->sec == $section) {
+                                        if ($record->batch == $batch && $record->sec == $section) {
                                             $advisorFound = $record;
                                             break;
                                         }
@@ -345,9 +344,9 @@
                                     <td>
                                         @if($advisorFound)
                                             {{ $advisorFound->advisorname }}
-                                            <button class="btn btn-sm btn-warning edit-advisor-btn" data-year="{{ $batch }}" data-sec="{{ $section }}">Edit</button>
+                                            <button class="btn btn-sm btn-warning edit-advisor-btn" data-batch="{{ $batch }}" data-sec="{{ $section }}" data-sem="{{ $semester }}">Edit</button>
                                         @else
-                                            <button class="btn btn-sm btn-primary choose-advisor-btn" data-year="{{ $batch }}" data-sec="{{ $section }}">Choose Advisor</button>
+                                            <button class="btn btn-sm btn-primary choose-advisor-btn" data-batch="{{ $batch }}" data-sec="{{ $section }}" data-sem="{{ $semester }}">Choose Advisor</button>
                                         @endif
                                     </td>
                                 </tr>
@@ -369,8 +368,9 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <input type="hidden" name="year" id="advisorYear">
+                            <input type="hidden" name="batch" id="advisorBatch">
                             <input type="hidden" name="sec" id="advisorSec">
+                            <input type="hidden" name="sem" id="advisorSem">
                             <div class="mb-3">
                                 <label for="facultySelect" class="form-label">Faculty</label>
                                 <select class="form-select" id="facultySelect" name="fid" required>
@@ -404,8 +404,9 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <input type="hidden" name="year" id="editAdvisorYear">
+                            <input type="hidden" name="batch" id="editAdvisorBatch">
                             <input type="hidden" name="sec" id="editAdvisorSec">
+                            <input type="hidden" name="sem" id="editAdvisorSem">
                             <div class="mb-3">
                                 <label for="facultySelectEdit" class="form-label">Faculty</label>
                                 <select class="form-select" id="facultySelectEdit" name="fid" required>
@@ -616,10 +617,14 @@
 
         // When 'Choose Advisor' button is clicked, open the modal and set year and section values
         $(document).on('click', '.choose-advisor-btn', function () {
-            const year = $(this).data('year');
+            const batch = $(this).data('batch');
             const sec = $(this).data('sec');
-            $('#advisorYear').val(year);
+            const sem = $(this).data('sem');
+            $('#advisorBatch').val(batch);
             $('#advisorSec').val(sec);
+            $('#advisorSem').val(sem);
+            // Hide the clicked button
+            $(this).hide();
             $('#chooseAdvisorModal').modal('show');
         });
 
@@ -657,7 +662,7 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'An error occurred while processing your request.',
+                        text: 'An error occurred while processing your request 89.',
                         confirmButtonText: 'Ok'
                     });
                 }
@@ -666,10 +671,12 @@
 
         // Open Edit Advisor Modal on Edit button click
         $(document).on('click', '.edit-advisor-btn', function () {
-            const year = $(this).data('year');
+            const batch = $(this).data('batch');
             const sec = $(this).data('sec');
-            $('#editAdvisorYear').val(year);
+            const sem = $(this).data('sem');
+            $('#editAdvisorBatch').val(batch);
             $('#editAdvisorSec').val(sec);
+            $('#editAdvisorSem').val(sem);
             $('#editAdvisorModal').modal('show');
         });
 
