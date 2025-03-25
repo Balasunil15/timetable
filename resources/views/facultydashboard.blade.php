@@ -58,7 +58,10 @@
             display: flex;
             gap: 20px;
             overflow-x: auto;
-        }
+        }.text-center td {
+        text-align: center;
+    }
+
 
         .content-nav li a {
             color: white;
@@ -333,7 +336,29 @@
                     </div>
                 </div>
             </div>
-
+            <!-- Existing Content Ends Here -->
+            <div class="container-fluid">
+                <div class="custom-tabs">
+                    <table id="facTable" class="table table-bordered">
+                        <thead class="gradient-header">
+                            <tr>
+                                <th>StudentId</th>
+                                <th>StudentName</th>
+                            </tr>
+                        </thead>
+                        <tbody class="align-middle text-center">
+                            @if(!empty($students) && is_array($students))
+                                @foreach($students as $student)
+                                    <tr>
+                                        <td>{{ $student->sid }}</td>
+                                        <td>{{ $student->sname }}</td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
         <!-- Footer -->
         @include ('footer')
@@ -380,6 +405,9 @@
                 showError();
                 return false;
             };
+
+            // Initialize DataTable for facTable
+            $('#facTable').DataTable();
         });
 
         document.addEventListener("DOMContentLoaded", function () {
