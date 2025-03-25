@@ -1,4 +1,3 @@
-<?php use Illuminate\Support\Facades\DB; ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -283,7 +282,7 @@
 
 <body>
     <!-- Sidebar -->
-    @include('sidebar')
+    @include ('sidebar')
 
     <!-- Main Content -->
     <div class="content">
@@ -293,7 +292,7 @@
         </div>
 
         <!-- Topbar -->
-        @include('topbar')
+        @include ('topbar')
 
         <!-- Breadcrumb -->
         <div class="breadcrumb-area custom-gradient">
@@ -308,117 +307,120 @@
         <!-- Content Area -->
         <div class="container-fluid">
             <div class="custom-tabs">
-                <h2>Advisors - Sections Overview</h2>
 
-                @php
-                    // Retrieve batch and semester from sections table using dept from session
-                    $sectionRecord = DB::table('sections')->where('dept', session('dept'))->first();
-                    $batch = $sectionRecord ? $sectionRecord->batch : 'N/A';
-                    $semester = $sectionRecord ? $sectionRecord->semester : 'N/A';
-                @endphp
-
-                <table id="advisorsTable" class="table table-bordered">
+                <div class="d-flex justify-content-end mb-3">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCourseModal">Add
+                        Course</button>
+                </div>
+                <!-- DataTable -->
+                <table id="coursesTable" class="table table-striped table-bordered">
                     <thead class="gradient-header">
                         <tr>
-                            <th>Batch</th>
-                            <th>Section</th>
-                            <th>Semester</th>
-                            <th>Advisor</th>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>Credits</th>
+                            <th>Type</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if(!empty($sections) && is_array($sections))
-                            @foreach($sections as $section)
-                                @php
-                                    $advisorFound = null;
-                                    foreach ($advisorRecords as $record) {
-                                        if ($record->year == $batch && $record->sec == $section) {
-                                            $advisorFound = $record;
-                                            break;
-                                        }
-                                    }
-                                @endphp
-                                <tr>
-                                    <td>{{ $batch }}</td>
-                                    <td>{{ $section }}</td>
-                                    <td>{{ $semester }}</td>
-                                    <td>
-                                        @if($advisorFound)
-                                            {{ $advisorFound->advisorname }}
-                                            <button class="btn btn-sm btn-warning edit-advisor-btn" data-year="{{ $batch }}" data-sec="{{ $section }}">Edit</button>
-                                        @else
-                                            <button class="btn btn-sm btn-primary choose-advisor-btn" data-year="{{ $batch }}" data-sec="{{ $section }}">Choose Advisor</button>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @endif
+                        @foreach($courses as $course)
+                            <tr>
+                                <td>{{ $course->courseCode }}</td>
+                                <td>{{ $course->courseName }}</td>
+                                <td>{{ $course->credits }}</td>
+                                <td>{{ $course->type }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning edit-btn"
+                                        data-course-code="{{ $course->courseCode }}"
+                                        data-course-name="{{ $course->courseName }}" data-credits="{{ $course->credits }}"
+                                        data-type="{{ $course->type }}">Edit</button>
+                                    <button class="btn btn-sm btn-danger delete-btn"
+                                        data-course-code="{{ $course->courseCode }}">Delete</button>
+                                </td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
+                <!-- Modal Form for Adding Course -->
+
             </div>
         </div>
-
-        <!-- Choose Advisor Modal -->
-        <div class="modal fade" id="chooseAdvisorModal" tabindex="-1" aria-labelledby="chooseAdvisorModalLabel"
+        <div class="modal fade" id="addCourseModal" tabindex="-1" aria-labelledby="addCourseModalLabel"
             aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form id="chooseAdvisorForm">
+                    <form id="addCourseForm">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="chooseAdvisorModalLabel">Choose Advisor</h5>
+                            <h5 class="modal-title" id="addCourseModalLabel">Add Course</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <input type="hidden" name="year" id="advisorYear">
-                            <input type="hidden" name="sec" id="advisorSec">
                             <div class="mb-3">
-                                <label for="facultySelect" class="form-label">Faculty</label>
-                                <select class="form-select" id="facultySelect" name="fid" required>
-                                    <option value="">-- Select Faculty --</option>
-                                    @foreach($facultyList as $faculty)
-                                        <option value="{{ $faculty->fid }}">{{ $faculty->name }}</option>
-                                    @endforeach
+                                <label for="courseCode" class="form-label">Course Code</label>
+                                <input type="text" class="form-control" id="courseCode" name="courseCode" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="courseName" class="form-label">Course Name</label>
+                                <input type="text" class="form-control" id="courseName" name="courseName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="courseCredits" class="form-label">Credits</label>
+                                <input type="number" class="form-control" id="courseCredits" name="courseCredits"
+                                    required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="courseType" class="form-label">Type</label>
+                                <select class="form-select" id="courseType" name="courseType" required>
+                                    <option value="Theory">Theory</option>
+                                    <option value="Lab">Lab</option>
                                 </select>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Course</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- New Edit Advisor Modal -->
-        <?php $allFaculty = DB::table('faculty')
-            ->where('dept', session('dept'))
-            ->where('role', 'faculty')
-            ->get(); ?>
-        <div class="modal fade" id="editAdvisorModal" tabindex="-1" aria-labelledby="editAdvisorModalLabel" aria-hidden="true">
+        <!-- New Edit Course Modal -->
+        <div class="modal fade" id="editCourseModal" tabindex="-1" aria-labelledby="editCourseModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form id="editAdvisorForm">
+                    <form id="editCourseForm">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="editAdvisorModalLabel">Edit Advisor</h5>
+                            <h5 class="modal-title" id="editCourseModalLabel">Edit Course</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <input type="hidden" name="year" id="editAdvisorYear">
-                            <input type="hidden" name="sec" id="editAdvisorSec">
                             <div class="mb-3">
-                                <label for="facultySelectEdit" class="form-label">Faculty</label>
-                                <select class="form-select" id="facultySelectEdit" name="fid" required>
-                                    <option value="">-- Select Faculty --</option>
-                                    @foreach($allFaculty as $faculty)
-                                        <option value="{{ $faculty->fid }}">{{ $faculty->name }}</option>
-                                    @endforeach
+                                <label for="editCourseCode" class="form-label">Course Code</label>
+                                <input type="text" class="form-control" id="editCourseCode" name="courseCode" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editCourseName" class="form-label">Course Name</label>
+                                <input type="text" class="form-control" id="editCourseName" name="courseName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editCourseCredits" class="form-label">Credits</label>
+                                <input type="number" class="form-control" id="editCourseCredits" name="courseCredits"
+                                    required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editCourseType" class="form-label">Type</label>
+                                <select class="form-select" id="editCourseType" name="courseType" required>
+                                    <option value="Theory">Theory</option>
+                                    <option value="Lab">Lab</option>
                                 </select>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
                         </div>
                     </form>
                 </div>
@@ -426,9 +428,10 @@
         </div>
 
         <!-- Footer -->
-        @include('footer')
+        @include ('footer')
     </div>
     <script>
+
         const loaderContainer = document.getElementById('loaderContainer');
 
         function showLoader() {
@@ -606,33 +609,29 @@
             }
         });
 
+
         $(document).ready(function () {
             // Initialize DataTable using existing courses displayed via Blade loop
-            $('#advisorsTable').DataTable({
+            $('#coursesTable').DataTable({
                 // DataTable initialization options can be added here if needed
             });
-            // Handle Add Course Form Submission (if needed)
         });
-
-        // When 'Choose Advisor' button is clicked, open the modal and set year and section values
-        $(document).on('click', '.choose-advisor-btn', function () {
-            const year = $(this).data('year');
-            const sec = $(this).data('sec');
-            $('#advisorYear').val(year);
-            $('#advisorSec').val(sec);
-            $('#chooseAdvisorModal').modal('show');
-        });
-
-        // Handle the form submission via AJAX
-        $('#chooseAdvisorForm').on('submit', function (e) {
+        $('#addCourseForm').on('submit', function (e) {
             e.preventDefault();
             var formData = $(this).serialize();
             $.ajax({
-                url: "{{ route('advisor.store') }}",
+                url: "{{ route('subjects.store') }}",
                 type: "POST",
                 data: formData,
                 success: function (response) {
-                    if (response.status === 'success') {
+                    if (response.status === 'error') {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Oops...',
+                            text: response.message,
+                            confirmButtonText: 'Ok'
+                        });
+                    } else if (response.status === 'success') {
                         Swal.fire({
                             icon: 'success',
                             title: 'Success',
@@ -640,16 +639,10 @@
                             confirmButtonText: 'Ok'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                // Optionally reload page/refresh the advisors table
-                                location.reload();
+                                $('#addCourseModal').modal('hide');
+                                $('#addCourseForm')[0].reset();
+                                // Optionally, refresh the DataTable
                             }
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: response.message,
-                            confirmButtonText: 'Ok'
                         });
                     }
                 },
@@ -664,25 +657,33 @@
             });
         });
 
-        // Open Edit Advisor Modal on Edit button click
-        $(document).on('click', '.edit-advisor-btn', function () {
-            const year = $(this).data('year');
-            const sec = $(this).data('sec');
-            $('#editAdvisorYear').val(year);
-            $('#editAdvisorSec').val(sec);
-            $('#editAdvisorModal').modal('show');
+        // Handle Edit button click
+        $('.edit-btn').on('click', function () {
+            const btn = $(this);
+            $('#editCourseCode').val(btn.data('course-code'));
+            $('#editCourseName').val(btn.data('course-name'));
+            $('#editCourseCredits').val(btn.data('credits'));
+            $('#editCourseType').val(btn.data('type'));
+            $('#editCourseModal').modal('show');
         });
 
-        // Handle Edit Advisor Form submission via AJAX
-        $('#editAdvisorForm').on('submit', function (e) {
+        // Handle Edit Course Form submission
+        $('#editCourseForm').on('submit', function (e) {
             e.preventDefault();
             var formData = $(this).serialize();
             $.ajax({
-                url: "{{ route('advisor.update') }}",
+                url: "{{ route('subjects.update') }}",
                 type: "POST",
                 data: formData,
                 success: function (response) {
-                    if (response.status === 'success') {
+                    if (response.status === 'error') {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Oops...',
+                            text: response.message,
+                            confirmButtonText: 'Ok'
+                        });
+                    } else if (response.status === 'success') {
                         Swal.fire({
                             icon: 'success',
                             title: 'Success',
@@ -690,17 +691,13 @@
                             confirmButtonText: 'Ok'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                $('#editAdvisorModal').modal('hide');
-                                // Optionally reload page/refresh table
-                                location.reload();
+                                $('#editCourseModal').modal('hide');
+                                $('#editCourseForm')[0].reset();
+                                var table = $('#coursesTable').DataTable();
+                                table.destroy();
+                                $('#coursesTable').DataTable();
+                                // Optionally reload DataTable or refresh rows.
                             }
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: response.message,
-                            confirmButtonText: 'Ok'
                         });
                     }
                 },
@@ -714,6 +711,53 @@
                 }
             });
         });
+
+        // Handle Delete button click
+        $('.delete-btn').on('click', function () {
+            var courseCode = $(this).data('course-code');
+            Swal.fire({
+                title: "Are you sure?",
+                text: "This course will be permanently deleted",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ route('subjects.delete') }}",
+                        type: "POST",
+                        data: { courseCode: courseCode },
+                        success: function (response) {
+                            if (response.status === 'success') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: response.message,
+                                    confirmButtonText: 'Ok'
+                                });
+
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.message,
+                                    confirmButtonText: 'Ok'
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'An error occurred while deleting the course.',
+                                confirmButtonText: 'Ok'
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
     </script>
 
 </body>
