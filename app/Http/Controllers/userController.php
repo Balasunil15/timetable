@@ -176,13 +176,29 @@ class userController extends Controller
 
     public function storeAdvisor(Request $request)
     {
-        // Validate input (year, sec, fid must be provided)
+        // Validate input using batch, sec, sem, and fid
         $data = $request->validate([
-            'year' => 'required|integer',
-            'sec'  => 'required|string',
-            'fid'  => 'required|string'
+            'batch' => 'required|string',
+            'sec'   => 'required|string',
+            'sem'   => 'required|string',
+            'fid'   => 'required|string'
         ]);
         $dept = $request->session()->get('dept');
+        
+        // Check if an advisor record already exists for the given dept, batch, sec, and semester
+        $exists = DB::table('advisor')
+            ->where('dept', $dept)
+            ->where('batch', $data['batch'])
+            ->where('sec', $data['sec'])
+            ->where('semester', $data['sem'])
+            ->exists();
+        if ($exists) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Advisor record already exists for the specified batch, section, and semester.'
+            ]);
+        }
+        
         // Get the chosen faculty record to retrieve advisor name
         $faculty = DB::table('faculty')
             ->where('fid', $data['fid'])
@@ -191,26 +207,32 @@ class userController extends Controller
         if (!$faculty) {
             return response()->json(['status' => 'error', 'message' => 'Faculty not found.']);
         }
-        // Insert advisor record; assume advisor table has columns: dept, year, sec, advisorname
-        DB::table('advisor')->updateOrInsert(
-            ['dept' => $dept, 'year' => $data['year'], 'sec' => $data['sec']],
-            ['advisorname' => $faculty->name]
-        );
+        
+        // Insert advisor record including semester
+        DB::table('advisor')->insert([
+            'dept'        => $dept,
+            'batch'       => $data['batch'],
+            'sec'         => $data['sec'],
+            'semester'    => $data['sem'],
+            'advisorname' => $faculty->name
+        ]);
         // Update faculty table: set advisor = 1 for chosen faculty
         DB::table('faculty')->where('fid', $data['fid'])->update(['advisor' => 1]);
-        return response()->json(['status' => 'success', 'message' => 'Advisor updated successfully.']);
+        return response()->json(['status' => 'success', 'message' => 'Advisor added successfully.']);
     }
 
     public function updateAdvisor(Request $request)
     {
+        // Validate input using batch, sec, sem and fid
         $data = $request->validate([
-            'year' => 'required|integer',
-            'sec'  => 'required|string',
-            'fid'  => 'required|string'
+            'batch' => 'required|string',
+            'sec'   => 'required|string',
+            'sem'   => 'required|string',
+            'fid'   => 'required|string'
         ]);
         $dept = $request->session()->get('dept');
 
-        // Get new advisor faculty record (all faculty regardless of advisor status)
+        // Get new advisor faculty record
         $newFaculty = DB::table('faculty')
             ->where('fid', $data['fid'])
             ->where('dept', $dept)
@@ -219,11 +241,12 @@ class userController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Faculty not found.']);
         }
 
-        // If a current advisor exists for the class, reset the previous advisor's flag
+        // If a current advisor exists for the class (matching batch, sec, and semester), reset the previous advisor's flag.
         $currentAdvisor = DB::table('advisor')
             ->where('dept', $dept)
-            ->where('year', $data['year'])
+            ->where('batch', $data['batch'])
             ->where('sec', $data['sec'])
+            ->where('semester', $data['sem'])
             ->first();
         if ($currentAdvisor) {
             DB::table('faculty')
@@ -240,8 +263,9 @@ class userController extends Controller
         if ($existingAdvisorRecord) {
             DB::table('advisor')
                 ->where('dept', $dept)
-                ->where('year', $existingAdvisorRecord->year)
+                ->where('batch', $existingAdvisorRecord->batch)
                 ->where('sec', $existingAdvisorRecord->sec)
+                ->where('semester', $existingAdvisorRecord->semester)
                 ->delete();
             DB::table('faculty')
                 ->where('name', $newFaculty->name)
@@ -249,12 +273,17 @@ class userController extends Controller
                 ->update(['advisor' => 0]);
         }
 
-        // Update or insert the advisor record with the new faculty name
+        // Update or insert the advisor record with the new faculty name matching batch, sec and sem
         DB::table('advisor')->updateOrInsert(
-            ['dept' => $dept, 'year' => $data['year'], 'sec' => $data['sec']],
+            [
+                'dept' => $dept,
+                'batch' => $data['batch'],
+                'sec' => $data['sec'],
+                'semester' => $data['sem']
+            ],
             ['advisorname' => $newFaculty->name]
         );
-        // Set the new advisor's column to 1
+        // Mark the new advisor in the faculty table
         DB::table('faculty')
             ->where('fid', $data['fid'])
             ->update(['advisor' => 1]);
