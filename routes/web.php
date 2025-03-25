@@ -52,4 +52,4 @@ Route::post('/advisor/store', [userController::class, 'storeAdvisor'])->name('ad
 Route::post('/advisor/update', [userController::class, 'updateAdvisor'])->name('advisor.update');
 
 Route::get('/advisor-subjects', [userController::class, 'advisorSubjects'])->name('advisorsubjects');
-Route::get('/students-list', [userController::class, 'studentsList'])->name('studentslist');
+Route::get('/studentslist', [userController::class, 'studentslist'])->name('studentslist');

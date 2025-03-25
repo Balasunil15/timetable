@@ -32,6 +32,21 @@ class userController extends Controller
             if (strtolower($faculty->role) === 'hod') {
                 return redirect()->route('hoddashboard');
             } elseif (strtolower($faculty->role) === 'faculty') {
+                if ($faculty->advisor == 1) {
+                    // Fetch advisor record mapping faculty->name with advisorname
+                    $advisorRecord = DB::table('advisor')
+                        ->where('dept', $faculty->dept)
+                        ->where('advisorname', $faculty->name)
+                        ->first();
+                    if ($advisorRecord) {
+                        // Store advisor details (batch, sec, semester) in session
+                        session([
+                            'batch' => $advisorRecord->batch,
+                            'sec' => $advisorRecord->sec,
+                            'semester' => $advisorRecord->semester
+                        ]);
+                    }
+                }
                 return redirect()->route('facultydashboard');
             } else {
                 return redirect()->back()->with('error', 'Invalid role.');
@@ -289,6 +304,24 @@ class userController extends Controller
             ->update(['advisor' => 1]);
 
         return response()->json(['status' => 'success', 'message' => 'Advisor updated successfully.']);
+    }
+
+    public function studentslist(Request $request)
+    {
+        $dept = $request->session()->get('dept');
+        $batch = $request->session()->get('batch');
+        $sec = $request->session()->get('sec');
+        $semester = $request->session()->get('semester');
+
+        $students = DB::table('student')
+            ->select('sid as regno', 'sname as studentName')
+            ->where('dept', $dept)
+            ->where('Batch', $batch)
+            ->where('section', $sec)
+            ->where('semester', $semester)
+            ->get();
+
+        return view('students', compact('students'));
     }
 
 }

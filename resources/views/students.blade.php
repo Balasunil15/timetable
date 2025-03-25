@@ -10,7 +10,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-5/bootstrap-5.css" rel="stylesheet">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
@@ -305,105 +304,27 @@
 
         <!-- Content Area -->
         <div class="container-fluid">
-            <div class="custom-tabs">
-                <ul class="nav nav-tabs" role="tablist"> <!-- Center the main tabs -->
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link active" data-bs-toggle="tab" id="edit-bus-tab" href="#publication" role="tab" aria-selected="true">
-                            <span class="hidden-xs-down" style="font-size: 0.9em;"><i class="fas fa-book tab-icon"></i> Publication</span>
-                        </a>
-                    </li>                   
-                </ul>
-                <div class="tab-content">
-                    <div class="tab-pane fade show active" id="publication" role="tabpanel">                        
-                        <ul class="nav navs-tabs justify-content-center ">
-                            <li class="nav-item" style="margin-right: 10px;"> <!-- Add margin between tabs -->
-                                <a class="nav-link active" style="font-size: 0.9em;" id="add-bus-tab" data-bs-toggle="tab" href="#journal" role="tab" aria-selected="true">
-                                    Journal
-                                </a>
-                            </li>
-                            <li class="nav-item "> <!-- Add margin between tabs -->
-                                <a class="nav-link" id="add-bus-tab" data-bs-toggle="tab" style="font-size: 0.9em;"
-                                    href="#conference" role="tab" aria-selected="false">
-                                    Conference
-                                </a>
-                            </li>
-                        </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane p-20 active" id="journal" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="card-header mb-3 " style="text-align: right;">
-                                            <button id="open_journal" class="btn btn-sm btn btn-primary" data-bs-toggle="modal" data-bs-target="#journalModal">
-                                                <b> Open Journal Form</b>
-                                            </button>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="table-responsive">
-                                                <table id="journal_table" class="table table-striped table-bordered">
-                                                    <thead class="gradient-header">
-                                                        <tr>
-                                                            <th>S.No</th>
-                                                            <th>Paper Title</th>
-                                                            <th>Journal Name</th>
-                                                            <th>J.Detail</th>
-                                                            <th>Document</th>
-                                                            <th style="width: 200px;">Action</th>
-
-                                                        </tr>
-                                                    </thead>
-                                                   
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <!-- </div> -->
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane p-20" id="conference" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-md-12">
-
-                                        <div class="card-header mb-3" style="text-align: right;">
-                                            <!-- <h4 class="mb-0">Conference Information</h4> -->
-                                            <button id="open_conference" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#conferenceModal">
-                                                <b>Open Conference Form</b></button>
-
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="table-responsive">
-                                                <table id="conference_table" class="table table-striped table-bordered">
-                                                    <thead class="gradient-header">
-                                                        <tr>
-                                                            <th>S.No</th>
-                                                            <th>Paper Title</th>
-                                                            <th>Conference Name</th>
-                                                            <th>Conference Details</th>
-                                                            <th>Document</th>
-                                                            <th style="width: 200px;">Action</th>
-                                                        </tr>
-                                                    </thead>
-                                                    
-                                                </table>
-
-
-                                            </div>
-
-
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                   
-
-
-
+                <div class="custom-tabs">
+                    <table id="facTable" class="table table-bordered">
+                        <thead class="gradient-header">
+                            <tr>
+                                <th>StudentId</th>
+                                <th>StudentName</th>
+                            </tr>
+                        </thead>
+                        <tbody class="align-middle text-center">
+                            @if(!empty($students) && is_array($students))
+                                @foreach($students as $student)
+                                    <tr>
+                                        <td>{{ $student->regno }}</td>
+                                        <td>{{ $student->studentName }}</td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
 
         <!-- Footer -->
         @include ('footer')
@@ -450,6 +371,7 @@
                 showError();
                 return false;
             };
+            $('#facTable').DataTable(); 
         });
 
         document.addEventListener("DOMContentLoaded", function () {

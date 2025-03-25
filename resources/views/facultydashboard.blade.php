@@ -336,29 +336,20 @@
                     </div>
                 </div>
             </div>
-            <!-- Existing Content Ends Here -->
-            <div class="container-fluid">
-                <div class="custom-tabs">
-                    <table id="facTable" class="table table-bordered">
-                        <thead class="gradient-header">
-                            <tr>
-                                <th>StudentId</th>
-                                <th>StudentName</th>
-                            </tr>
-                        </thead>
-                        <tbody class="align-middle text-center">
-                            @if(!empty($students) && is_array($students))
-                                @foreach($students as $student)
-                                    <tr>
-                                        <td>{{ $student->sid }}</td>
-                                        <td>{{ $student->sname }}</td>
-                                    </tr>
-                                @endforeach
-                            @endif
-                        </tbody>
-                    </table>
-                </div>
+            @if(session('advisor') == 1)
+            <div class="card mb-3">
+              <div class="card-header">
+                Advisor Details
+              </div>
+              <div class="card-body">
+                <p><strong>Batch: </strong>{{ session('batch') }}</p>
+                <p><strong>Section: </strong>{{ session('sec') }}</p>
+                <p><strong>Semester: </strong>{{ session('semester') }}</p>
+              </div>
             </div>
+            @endif
+            <!-- Existing Content Ends Here -->
+            
         </div>
         <!-- Footer -->
         @include ('footer')
