@@ -184,7 +184,6 @@
     <div class="user-profile">
         <div class="user-menu" id="userMenu">
             <div class="user-avatar">
-                <img src="" alt="User">
                 <div class="online-indicator"></div>
             </div>
             <div class="dropdown-menu">
