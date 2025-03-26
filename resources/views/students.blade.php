@@ -306,22 +306,22 @@
         <div class="container-fluid">
         <div class="custom-tabs">
             <h2>Students List</h2>
-            <table id="facTable" class="table table-striped table-bordered">
-                <thead class="gradient-header">
-                    <tr>
-                        <th>Reg No</th>
-                        <th>Student Name</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($students as $student)
-                    <tr>
-                        <td>{{ $student->regno }}</td>
-                        <td>{{ $student->studentName }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table></div>
+            <table id="facTable" class="table table-striped table-bordered text-center">
+    <thead class="gradient-header">
+        <tr>
+            <th class="text-center">Reg No</th>
+            <th class="text-center">Student Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($students as $student)
+        <tr>
+            <td class="text-center">{{ $student->regno }}</td>
+            <td class="text-center">{{ $student->studentName }}</td>
+        </tr>
+        @endforeach
+    </tbody>
+</table></div>
         </div>
 
         <!-- Footer -->
