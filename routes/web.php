@@ -56,3 +56,4 @@ Route::get('/studentslist', [userController::class, 'studentslist'])->name('stud
 
 // Added route for assigning subject
 Route::post('/subject/assign', [userController::class, 'assignSubject'])->name('subject.assign');
+Route::post('/subject/remove', [userController::class, 'removeSubject'])->name('subject.remove');

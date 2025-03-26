@@ -379,4 +379,27 @@ class userController extends Controller
         ]);
     }
 
+    public function removeSubject(Request $request)
+    {
+        $subjectcode = $request->input('subjectcode');
+        $cid = session('cid');
+
+        $deleted = DB::table('subjects')
+            ->where('subjectcode', $subjectcode)
+            ->where('cid', $cid)
+            ->delete();
+
+        if ($deleted) {
+            return response()->json([
+                'status' => 'success',
+                'message' => "Subject {$subjectcode} removed successfully"
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Subject {$subjectcode} removal failed"
+            ]);
+        }
+    }
+
 }

@@ -328,7 +328,7 @@
                                                                                 ->where('cid', session('cid'))
                                                                                 ->exists()
                                                                         )
-                                                                                                                <button class="btn btn-danger">Remove</button>
+                                                                                                                <button class="btn btn-danger remove-subject-btn" data-subjectcode="{{ $course->subcode }}">Remove</button>
                                                                         @else
                                                                             <button class="btn btn-primary" data-bs-toggle="modal"
                                                                                 data-bs-target="#facultyModal">Choose Faculty</button>
@@ -554,6 +554,44 @@
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
+        });
+
+        $(document).on('click', '.remove-subject-btn', function () {
+            var subjectcode = $(this).data('subjectcode');
+            $.ajax({
+                url: "{{ route('subject.remove') }}",
+                type: "POST",
+                data: { subjectcode: subjectcode },
+                success: function(response) {
+                    if(response.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Removed',
+                            text: response.message,
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            if(result.isConfirmed){
+                                location.reload();
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message,
+                            confirmButtonText: 'Ok'
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while processing your request.',
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            });
         });
     </script>
 

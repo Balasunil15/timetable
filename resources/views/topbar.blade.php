@@ -180,7 +180,9 @@
     <div class="hamburger" id="hamburger">
         <i class="fas fa-bars"></i>
     </div>
-
+    <marquee behavior="scroll" direction="left" style="color: white; font-weight: bold;">
+        Welcome {{ session('name') }}
+    </marquee>
     <div class="user-profile">
         <div class="user-menu" id="userMenu">
             <div class="user-avatar">
@@ -193,7 +195,6 @@
                 </a>
             </div>
         </div>
-        <span>mkce</span>
     </div>
 
 </div>
