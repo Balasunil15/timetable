@@ -341,4 +341,42 @@ class userController extends Controller
         return view('advisorsubjects', compact('courses'));
     }
 
+    public function assignSubject(Request $request)
+    {
+        $data = $request->validate([
+            'subjectcode' => 'required|string',
+            'subjectname' => 'required|string',
+            'fid'         => 'required|string'
+        ]);
+        // Retrieve additional values from session
+        $cid      = session('cid');
+        $dept     = session('dept');
+        $batch    = session('batch');
+        $sec      = session('sec');
+        $semester = session('semester');
+
+        // Get faculty name for the provided fid
+        $faculty = DB::table('faculty')->where('fid', $data['fid'])->first();
+        if (!$faculty) {
+            return response()->json(['status' => 'error', 'message' => 'Faculty not found.'], 400);
+        }
+
+        // Insert record into subjects table with provided and session data
+        DB::table('subjects')->insert([
+            'cid'         => $cid,
+            'subjectcode' => $data['subjectcode'],
+            'subjectname' => $data['subjectname'],
+            'fname'       => $faculty->name,
+            'semester'    => $semester,
+            'dept'        => $dept,
+            'batch'       => $batch,
+            'sec'         => $sec
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => "Faculty {$faculty->name} assigned to subject {$data['subjectname']}"
+        ]);
+    }
+
 }

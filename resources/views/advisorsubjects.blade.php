@@ -305,32 +305,40 @@
                 </ul>
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="subjects" role="tabpanel" aria-labelledby="subjects-tab">
-                    <table id="subjectsTable" class="table table-bordered text-center">
-                    <thead class="gradient-header">
-                        <tr>
-                            <th class="text-center">Subcode</th>
-                            <th class="text-center">Subname</th>
-                            <th class="text-center">Credits</th>
-                            <th class="text-center">Type</th>
-                            <th class="text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($courses as $course)
-                            <tr>
-                                <td>{{ $course->subcode }}</td>
-                                <td>{{ $course->subname }}</td>
-                                <td>{{ $course->credits }}</td>
-                                <td>{{ $course->type }}</td>
-                                <td class="text-center">
-                                    <button class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#facultyModal">Choose faculty</button>
-                                    <button class="btn btn-danger">Remove</button>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        <table id="subjectsTable" class="table table-bordered text-center">
+                            <thead class="gradient-header">
+                                <tr>
+                                    <th class="text-center">Subcode</th>
+                                    <th class="text-center">Subname</th>
+                                    <th class="text-center">Credits</th>
+                                    <th class="text-center">Type</th>
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($courses as $course)
+                                                                <tr>
+                                                                    <td>{{ $course->subcode }}</td>
+                                                                    <td>{{ $course->subname }}</td>
+                                                                    <td>{{ $course->credits }}</td>
+                                                                    <td>{{ $course->type }}</td>
+                                                                    <td class="text-center">
+                                                                        @if(
+                                                                            \DB::table('subjects')
+                                                                                ->where('subjectcode', $course->subcode)
+                                                                                ->where('cid', session('cid'))
+                                                                                ->exists()
+                                                                        )
+                                                                                                                <button class="btn btn-danger">Remove</button>
+                                                                        @else
+                                                                            <button class="btn btn-primary" data-bs-toggle="modal"
+                                                                                data-bs-target="#facultyModal">Choose Faculty</button>
+                                                                        @endif
+                                                                    </td>
+                                                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
 
                     </div>
                     <div class="tab-pane fade" id="students" role="tabpanel" aria-labelledby="students-tab">
@@ -361,7 +369,7 @@
                     </div>
                 </div>
             </div>
-           
+
         </div>
 
         <!-- Footer -->
@@ -550,28 +558,44 @@
         });
     </script>
 
+    @php
+        $dept = session('dept');
+        $facultyNotAssigned = DB::table('faculty')
+            ->where('dept', $dept)
+            ->whereNotIn('name', function ($query) use ($dept) {
+                $query->select('fname')
+                    ->where('dept', $dept)
+                    ->where('semester', session('semester'))
+                    ->from('subjects');
+            })
+            ->get(); 
+    @endphp
     <!-- Faculty Modal -->
     <div class="modal fade" id="facultyModal" tabindex="-1" aria-labelledby="facultyModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="facultyModalLabel">Select Faculty</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <label for="facultySelect" class="form-label">Choose Faculty:</label>
-                    <select class="form-select" id="facultySelect">
-                        <option selected disabled>Select a faculty</option>
-                        <option value="faculty1">Faculty 1</option>
-                        <option value="faculty2">Faculty 2</option>
-                        <option value="faculty3">Faculty 3</option>
-                        <!-- Add more faculty as needed -->
-                    </select>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="submitFaculty()">Submit</button>
-                </div>
+                <form id="assignSubjectForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="facultyModalLabel">Select Faculty</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Hidden inputs for subject info; these must be set before showing the modal -->
+                        <input type="hidden" name="subjectcode" id="subjectcode">
+                        <input type="hidden" name="subjectname" id="subjectname">
+                        <label for="facultySelect" class="form-label">Choose Faculty:</label>
+                        <select class="form-select" id="facultySelect" name="fid" required>
+                            <option selected disabled>Select a faculty</option>
+                            @foreach($facultyNotAssigned as $faculty)
+                                <option value="{{ $faculty->fid }}">{{ $faculty->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -689,6 +713,54 @@
                 checkbox.checked = (index >= half);
             });
         }
+
+        // When a "Choose Faculty" button is clicked in the table row, set the hidden fields in the modal
+        $(document).on('click', '.btn-primary[data-bs-target="#facultyModal"]', function () {
+            const subjectcode = $(this).closest('tr').find('td:first').text().trim();
+            const subjectname = $(this).closest('tr').find('td:nth-child(2)').text().trim();
+            $('#subjectcode').val(subjectcode);
+            $('#subjectname').val(subjectname);
+        });
+
+        // On facultyModal form submission, send AJAX POST to assign the subject
+        $('#assignSubjectForm').on('submit', function(e) {
+            e.preventDefault();
+            var formData = $(this).serialize();
+            $.ajax({
+                url: "{{ route('subject.assign') }}",
+                type: "POST",
+                data: formData,
+                success: function(response) {
+                    if(response.status === 'success'){
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message,
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            if(result.isConfirmed){
+                                location.reload();
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message,
+                            confirmButtonText: 'Ok'
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while processing your request.',
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            });
+        });
     </script>
 
 </body>
