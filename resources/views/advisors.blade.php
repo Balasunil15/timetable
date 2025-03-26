@@ -623,9 +623,8 @@
             $('#advisorBatch').val(batch);
             $('#advisorSec').val(sec);
             $('#advisorSem').val(sem);
-            // Hide the clicked button
-            $(this).hide();
             $('#chooseAdvisorModal').modal('show');
+            e.preventDefault();
         });
 
         // Handle the form submission via AJAX
