@@ -593,6 +593,67 @@
                 }
             });
         });
+
+        // When a "Select Students" button is clicked, fetch students dynamically
+        $(document).on('click', '.btn-primary[data-bs-target="#studentsModal"]', function () {
+            const subjectCode = $(this).closest('tr').find('td:first').text().trim();
+            const subjectName = $(this).closest('tr').find('td:nth-child(2)').text().trim();
+
+            // Set subject details in the modal
+            $('#studentsModalLabel').text(`Select Students for ${subjectName} (${subjectCode})`);
+
+            // Fetch students dynamically based on advisor's department, section, and batch
+            $.ajax({
+                url: "{{ route('students.fetch') }}", // Define this route in your web.php
+                type: "GET",
+                data: {
+                    dept: "{{ session('dept') }}", // Advisor's department
+                    section: "{{ session('sec') }}", // Advisor's section
+                    batch: "{{ session('batch') }}" // Advisor's batch
+                },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        const studentsList = response.data;
+                        const leftColumn = $('#studentsModal .list-group').first();
+                        const rightColumn = $('#studentsModal .list-group').last();
+
+                        // Clear existing student lists
+                        leftColumn.empty();
+                        rightColumn.empty();
+
+                        // Populate students dynamically
+                        studentsList.forEach((student, index) => {
+                            const studentItem = `
+                                <li class="list-group-item">
+                                    <input type="checkbox" id="student${student.uid}" name="student${student.uid}">
+                                    <label for="student${student.uid}">${student.sname} (ID: ${student.uid})</label>
+                                </li>
+                            `;
+                            if (index % 2 === 0) {
+                                leftColumn.append(studentItem);
+                            } else {
+                                rightColumn.append(studentItem);
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message,
+                            confirmButtonText: 'Ok'
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to fetch students. Please try again.',
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            });
+        });
     </script>
 
     @php

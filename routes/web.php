@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\userController;
 use App\Http\Controllers\FacultyController;
+use App\Http\Controllers\StudentController;
 
 Route::get('/login', function () {
     return view('login');
@@ -57,3 +58,6 @@ Route::get('/studentslist', [userController::class, 'studentslist'])->name('stud
 // Added route for assigning subject
 Route::post('/subject/assign', [userController::class, 'assignSubject'])->name('subject.assign');
 Route::post('/subject/remove', [userController::class, 'removeSubject'])->name('subject.remove');
+
+// Updated route to use userController for fetching students
+Route::get('/students/fetch', [userController::class, 'fetchStudents'])->name('students.fetch');

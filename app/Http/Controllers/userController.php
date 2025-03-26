@@ -402,4 +402,29 @@ class userController extends Controller
         }
     }
 
+    public function fetchStudents(Request $request)
+    {
+        $dept = $request->input('dept');
+        $section = $request->input('section');
+        $batch = $request->input('batch');
+
+        try {
+            $students = DB::table('student')
+                ->where('dept', $dept)
+                ->where('section', $section)
+                ->where('Batch', $batch)
+                ->get(['uid', 'sname']);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $students
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch students. Please try again.'
+            ]);
+        }
+    }
+
 }
