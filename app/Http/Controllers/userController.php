@@ -328,11 +328,17 @@ class userController extends Controller
         return view('students', compact('students'));
     }
 
-    public function advisorsubjects(Request $request){
+    public function advisorsubjects(Request $request)
+    {
         if (!session()->has('fid')) {
             return redirect()->route('login');
         }
-        return view('advisorsubjects');
+        $dept = $request->session()->get('dept');
+        $courses = DB::table('courses')
+            ->select('subcode', 'subname', 'credits', 'type')
+            ->where('dept', $dept)
+            ->get();
+        return view('advisorsubjects', compact('courses'));
     }
 
 }

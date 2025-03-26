@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -285,88 +286,82 @@
                     <li class="breadcrumb-item active" aria-current="page">Research</li>
                 </ol>
             </nav>
-        </div>        
+        </div>
 
         <!-- Content Area -->
         <div class="container-fluid">
             <div class="custom-tabs">
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="subjects-tab" data-bs-toggle="tab" data-bs-target="#subjects" type="button" role="tab" aria-controls="subjects" aria-selected="true">Select Subjects</button>
+                        <button class="nav-link active" id="subjects-tab" data-bs-toggle="tab"
+                            data-bs-target="#subjects" type="button" role="tab" aria-controls="subjects"
+                            aria-selected="true">Select Subjects</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button" role="tab" aria-controls="students" aria-selected="false">Select Students</button>
+                        <button class="nav-link" id="students-tab" data-bs-toggle="tab" data-bs-target="#students"
+                            type="button" role="tab" aria-controls="students" aria-selected="false">Select
+                            Students</button>
                     </li>
                 </ul>
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="subjects" role="tabpanel" aria-labelledby="subjects-tab">
                     <table id="subjectsTable" class="table table-bordered text-center">
-    <thead class="gradient-header">
-        <tr>
-            <th class="text-center">Subject Code</th>
-            <th class="text-center">Subject Name</th>
-            <th class="text-center">Credits</th>
-            <th class="text-center">Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td class="text-center">SUB001</td>
-            <td class="text-center">Mathematics</td>
-            <td class="text-center">4</td>
-            <td class="text-center">
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#facultyModal">Choose faculty</button>
-                <button class="btn btn-danger">Remove</button>
-            </td>
-        </tr>
-        <tr>
-            <td class="text-center">SUB002</td>
-            <td class="text-center">Physics</td>
-            <td class="text-center">3</td>
-            <td class="text-center">
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#facultyModal">Choose Faculty</button>
-                <button class="btn btn-danger">Remove</button>
-            </td>
-        </tr>
-        <tr>
-            <td class="text-center">SUB003</td>
-            <td class="text-center">Chemistry</td>
-            <td class="text-center">3</td>
-            <td class="text-center">
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#facultyModal">Choose Faculty</button>
-                <button class="btn btn-danger">Remove</button>
-            </td>
-        </tr>
-    </tbody>
-</table>
+                    <thead class="gradient-header">
+                        <tr>
+                            <th class="text-center">Subcode</th>
+                            <th class="text-center">Subname</th>
+                            <th class="text-center">Credits</th>
+                            <th class="text-center">Type</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($courses as $course)
+                            <tr>
+                                <td>{{ $course->subcode }}</td>
+                                <td>{{ $course->subname }}</td>
+                                <td>{{ $course->credits }}</td>
+                                <td>{{ $course->type }}</td>
+                                <td class="text-center">
+                                    <button class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#facultyModal">Choose faculty</button>
+                                    <button class="btn btn-danger">Remove</button>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
 
                     </div>
                     <div class="tab-pane fade" id="students" role="tabpanel" aria-labelledby="students-tab">
-                    <table id="studentsTable" class="table table-bordered text-center">
-    <thead class="gradient-header">
-        <tr>
-            <th class="text-center">Subject Code</th>
-            <th class="text-center">Subject Name</th>
-            <th class="text-center">Students List</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td class="text-center">SUB001</td>
-            <td class="text-center">Mathematics</td>
-            <td class="text-center"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentsModal">Select Students</button></td>
-        </tr>
-        <tr>
-            <td class="text-center">SUB002</td>
-            <td class="text-center">Physics</td>
-            <td class="text-center"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentsModal">Select Students</button></td>
-        </tr>
-    </tbody>
-</table>
+                        <table id="studentsTable" class="table table-bordered text-center">
+                            <thead class="gradient-header">
+                                <tr>
+                                    <th class="text-center">Subject Code</th>
+                                    <th class="text-center">Subject Name</th>
+                                    <th class="text-center">Students List</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center">SUB001</td>
+                                    <td class="text-center">Mathematics</td>
+                                    <td class="text-center"><button class="btn btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#studentsModal">Select Students</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">SUB002</td>
+                                    <td class="text-center">Physics</td>
+                                    <td class="text-center"><button class="btn btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#studentsModal">Select Students</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
 
                     </div>
                 </div>
             </div>
+           
         </div>
 
         <!-- Footer -->
@@ -554,142 +549,147 @@
             }
         });
     </script>
-   
-<!-- Faculty Modal -->
-<div class="modal fade" id="facultyModal" tabindex="-1" aria-labelledby="facultyModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="facultyModalLabel">Select Faculty</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <label for="facultySelect" class="form-label">Choose Faculty:</label>
-                <select class="form-select" id="facultySelect">
-                    <option selected disabled>Select a faculty</option>
-                    <option value="faculty1">Faculty 1</option>
-                    <option value="faculty2">Faculty 2</option>
-                    <option value="faculty3">Faculty 3</option>
-                    <!-- Add more faculty as needed -->
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="submitFaculty()">Submit</button>
+
+    <!-- Faculty Modal -->
+    <div class="modal fade" id="facultyModal" tabindex="-1" aria-labelledby="facultyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="facultyModalLabel">Select Faculty</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="facultySelect" class="form-label">Choose Faculty:</label>
+                    <select class="form-select" id="facultySelect">
+                        <option selected disabled>Select a faculty</option>
+                        <option value="faculty1">Faculty 1</option>
+                        <option value="faculty2">Faculty 2</option>
+                        <option value="faculty3">Faculty 3</option>
+                        <!-- Add more faculty as needed -->
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitFaculty()">Submit</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Students Modal -->
-<div class="modal fade" id="studentsModal" tabindex="-1" aria-labelledby="studentsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="studentsModalLabel">Select Students</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row mb-3">
-                    <div class="col-md-2">
-                        <button class="btn btn-outline-primary w-100" onclick="selectAllStudents()">Select All</button>
+    <!-- Students Modal -->
+    <div class="modal fade" id="studentsModal" tabindex="-1" aria-labelledby="studentsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="studentsModalLabel">Select Students</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-primary w-100" onclick="selectAllStudents()">Select
+                                All</button>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-primary w-100" onclick="selectOddStudents()">Odd
+                                Students</button>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-primary w-100" onclick="selectEvenStudents()">Even
+                                Students</button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-primary w-100" onclick="selectFirstHalfStudents()">1st Half
+                                Students</button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-primary w-100" onclick="selectSecondHalfStudents()">2nd Half
+                                Students</button>
+                        </div>
                     </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-outline-primary w-100" onclick="selectOddStudents()">Odd Students</button>
-                    </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-outline-primary w-100" onclick="selectEvenStudents()">Even Students</button>
-                    </div>
-                    <div class="col-md-3">
-                        <button class="btn btn-outline-primary w-100" onclick="selectFirstHalfStudents()">1st Half Students</button>
-                    </div>
-                    <div class="col-md-3">
-                        <button class="btn btn-outline-primary w-100" onclick="selectSecondHalfStudents()">2nd Half Students</button>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    <input type="checkbox" id="student1" name="student1">
+                                    <label for="student1">Student 1 (ID: 001)</label>
+                                </li>
+                                <li class="list-group-item">
+                                    <input type="checkbox" id="student2" name="student2">
+                                    <label for="student2">Student 2 (ID: 002)</label>
+                                </li>
+                                <li class="list-group-item">
+                                    <input type="checkbox" id="student3" name="student3">
+                                    <label for="student3">Student 3 (ID: 003)</label>
+                                </li>
+                                <!-- Add more students as needed -->
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    <input type="checkbox" id="student4" name="student4">
+                                    <label for="student4">Student 4 (ID: 004)</label>
+                                </li>
+                                <li class="list-group-item">
+                                    <input type="checkbox" id="student5" name="student5">
+                                    <label for="student5">Student 5 (ID: 005)</label>
+                                </li>
+                                <li class="list-group-item">
+                                    <input type="checkbox" id="student6" name="student6">
+                                    <label for="student6">Student 6 (ID: 006)</label>
+                                </li>
+                                <!-- Add more students as needed -->
+                            </ul>
+                        </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <ul class="list-group">
-                            <li class="list-group-item">
-                                <input type="checkbox" id="student1" name="student1">
-                                <label for="student1">Student 1 (ID: 001)</label>
-                            </li>
-                            <li class="list-group-item">
-                                <input type="checkbox" id="student2" name="student2">
-                                <label for="student2">Student 2 (ID: 002)</label>
-                            </li>
-                            <li class="list-group-item">
-                                <input type="checkbox" id="student3" name="student3">
-                                <label for="student3">Student 3 (ID: 003)</label>
-                            </li>
-                            <!-- Add more students as needed -->
-                        </ul>
-                    </div>
-                    <div class="col-md-6">
-                        <ul class="list-group">
-                            <li class="list-group-item">
-                                <input type="checkbox" id="student4" name="student4">
-                                <label for="student4">Student 4 (ID: 004)</label>
-                            </li>
-                            <li class="list-group-item">
-                                <input type="checkbox" id="student5" name="student5">
-                                <label for="student5">Student 5 (ID: 005)</label>
-                            </li>
-                            <li class="list-group-item">
-                                <input type="checkbox" id="student6" name="student6">
-                                <label for="student6">Student 6 (ID: 006)</label>
-                            </li>
-                            <!-- Add more students as needed -->
-                        </ul>
-                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Submit</button>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Submit</button>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    function selectAllStudents() {
-        const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = true;
-        });
-    }
+    <script>
+        function selectAllStudents() {
+            const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        }
 
-    function selectOddStudents() {
-        const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
-        checkboxes.forEach((checkbox, index) => {
-            checkbox.checked = (index % 2 === 0);
-        });
-    }
+        function selectOddStudents() {
+            const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
+            checkboxes.forEach((checkbox, index) => {
+                checkbox.checked = (index % 2 === 0);
+            });
+        }
 
-    function selectEvenStudents() {
-        const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
-        checkboxes.forEach((checkbox, index) => {
-            checkbox.checked = (index % 2 !== 0);
-        });
-    }
+        function selectEvenStudents() {
+            const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
+            checkboxes.forEach((checkbox, index) => {
+                checkbox.checked = (index % 2 !== 0);
+            });
+        }
 
-    function selectFirstHalfStudents() {
-        const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
-        const half = Math.ceil(checkboxes.length / 2);
-        checkboxes.forEach((checkbox, index) => {
-            checkbox.checked = (index < half);
-        });
-    }
+        function selectFirstHalfStudents() {
+            const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
+            const half = Math.ceil(checkboxes.length / 2);
+            checkboxes.forEach((checkbox, index) => {
+                checkbox.checked = (index < half);
+            });
+        }
 
-    function selectSecondHalfStudents() {
-        const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
-        const half = Math.ceil(checkboxes.length / 2);
-        checkboxes.forEach((checkbox, index) => {
-            checkbox.checked = (index >= half);
-        });
-    }
-</script>
+        function selectSecondHalfStudents() {
+            const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
+            const half = Math.ceil(checkboxes.length / 2);
+            checkboxes.forEach((checkbox, index) => {
+                checkbox.checked = (index >= half);
+            });
+        }
+    </script>
 
 </body>
 
