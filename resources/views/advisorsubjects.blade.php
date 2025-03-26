@@ -300,72 +300,70 @@
                 </ul>
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="subjects" role="tabpanel" aria-labelledby="subjects-tab">
-                        <table id="subjectsTable" class="table table-bordered">
-                            <thead class="gradient-header">
-                                <tr>
-                                    <th>Subject Code</th>
-                                    <th>Subject Name</th>
-                                    <th>Credits</th>
-                                    <th>Select Faculty</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>SUB001</td>
-                                    <td>Mathematics</td>
-                                    <td>4</td>
-                                    <td class="text-center"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#facultyModal">Select Faculty</button></td>
-                                    <td class="text-center">
-                                        <button class="btn btn-success">Select</button>
-                                        <button class="btn btn-danger">Remove</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>SUB002</td>
-                                    <td>Physics</td>
-                                    <td>3</td>
-                                    <td class="text-center"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#facultyModal">Select Faculty</button></td>
-                                    <td class="text-center">
-                                        <button class="btn btn-success">Select</button>
-                                        <button class="btn btn-danger">Remove</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>SUB003</td>
-                                    <td>Chemistry</td>
-                                    <td>3</td>
-                                    <td class="text-center"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#facultyModal">Select Faculty</button></td>
-                                    <td class="text-center">
-                                        <button class="btn btn-success">Select</button>
-                                        <button class="btn btn-danger">Remove</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <table id="subjectsTable" class="table table-bordered text-center">
+    <thead class="gradient-header">
+        <tr>
+            <th class="text-center">Subject Code</th>
+            <th class="text-center">Subject Name</th>
+            <th class="text-center">Credits</th>
+            <th class="text-center">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="text-center">SUB001</td>
+            <td class="text-center">Mathematics</td>
+            <td class="text-center">4</td>
+            <td class="text-center">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#facultyModal">Choose faculty</button>
+                <button class="btn btn-danger">Remove</button>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">SUB002</td>
+            <td class="text-center">Physics</td>
+            <td class="text-center">3</td>
+            <td class="text-center">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#facultyModal">Choose Faculty</button>
+                <button class="btn btn-danger">Remove</button>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center">SUB003</td>
+            <td class="text-center">Chemistry</td>
+            <td class="text-center">3</td>
+            <td class="text-center">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#facultyModal">Choose Faculty</button>
+                <button class="btn btn-danger">Remove</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
                     </div>
                     <div class="tab-pane fade" id="students" role="tabpanel" aria-labelledby="students-tab">
-                        <table id="studentsTable" class="table table-bordered">
-                            <thead class="gradient-header">
-                                <tr>
-                                    <th>Subject Code</th>
-                                    <th>Subject Name</th>
-                                    <th>Select Students</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>SUB001</td>
-                                    <td>Mathematics</td>
-                                    <td class="text-center"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentsModal">Select Students</button></td>
-                                </tr>
-                                <tr>
-                                    <td>SUB002</td>
-                                    <td>Physics</td>
-                                    <td class="text-center"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentsModal">Select Students</button></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <table id="studentsTable" class="table table-bordered text-center">
+    <thead class="gradient-header">
+        <tr>
+            <th class="text-center">Subject Code</th>
+            <th class="text-center">Subject Name</th>
+            <th class="text-center">Students List</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="text-center">SUB001</td>
+            <td class="text-center">Mathematics</td>
+            <td class="text-center"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentsModal">Select Students</button></td>
+        </tr>
+        <tr>
+            <td class="text-center">SUB002</td>
+            <td class="text-center">Physics</td>
+            <td class="text-center"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentsModal">Select Students</button></td>
+        </tr>
+    </tbody>
+</table>
+
                     </div>
                 </div>
             </div>
@@ -566,16 +564,18 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <ul class="list-group">
-                    <li class="list-group-item">Faculty 1</li>
-                    <li class="list-group-item">Faculty 2</li>
-                    <li class="list-group-item">Faculty 3</li>
+                <label for="facultySelect" class="form-label">Choose Faculty:</label>
+                <select class="form-select" id="facultySelect">
+                    <option selected disabled>Select a faculty</option>
+                    <option value="faculty1">Faculty 1</option>
+                    <option value="faculty2">Faculty 2</option>
+                    <option value="faculty3">Faculty 3</option>
                     <!-- Add more faculty as needed -->
-                </ul>
+                </select>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-primary" onclick="submitFaculty()">Submit</button>
             </div>
         </div>
     </div>
