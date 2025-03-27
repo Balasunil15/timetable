@@ -45,6 +45,7 @@ Route::get('/logout', [userController::class, 'logout'])->name('logout');
 // Added routes for subjects and advisors
 Route::get('/subjects', [userController::class, 'subjects'])->name('subjects');
 Route::post('/subjects/store', [userController::class, 'storeCourse'])->name('subjects.store');
+Route::post('/courses/import', [userController::class, 'storeCoursess'])->name('courses.import');
 Route::post('/subjects/update', [userController::class, 'updateCourse'])->name('subjects.update');
 Route::post('/subjects/delete', [userController::class, 'deleteCourse'])->name('subjects.delete');
 Route::get('/advisors', [userController::class, 'advisors'])->name('advisors');
