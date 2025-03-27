@@ -158,7 +158,6 @@ class userController extends Controller
             if (count($row) == 4) { 
                 $exists = DB::table('courses')
             ->where('subcode', $row[0])
-            ->where('dept', $dept)
             ->exists();
 
         if ($exists) {
