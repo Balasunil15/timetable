@@ -311,6 +311,7 @@
                                     <th class="text-center">Subname</th>
                                     <th class="text-center">Credits</th>
                                     <th class="text-center">Type</th>
+                                    <th class="text-center">Faculty</th> <!-- New column for faculty -->
                                     <th class="text-center">Action</th>
                                 </tr>
                             </thead>
@@ -321,6 +322,20 @@
                                                                     <td>{{ $course->subname }}</td>
                                                                     <td>{{ $course->credits }}</td>
                                                                     <td>{{ $course->type }}</td>
+                                                                    <td>
+                                                                        @php
+                                                                            $faculty = DB::table('subjects')
+                                                                                ->where('subjectcode', $course->subcode)
+                                                                                ->where('cid', session('cid'))
+                                                                                ->select('fname1', 'fname2')
+                                                                                ->first();
+                                                                        @endphp
+                                                                        @if($faculty)
+                                                                            {{ $faculty->fname1 }}{{ $faculty->fname2 ? ', ' . $faculty->fname2 : '' }}
+                                                                        @else
+                                                                            Not Assigned
+                                                                        @endif
+                                                                    </td>
                                                                     <td class="text-center">
                                                                         @if(
                                                                             \DB::table('subjects')
@@ -662,7 +677,7 @@
         $facultyNotAssigned = DB::table('faculty')
             ->where('dept', $dept)
             ->whereNotIn('name', function ($query) use ($dept) {
-                $query->select('fname')
+                $query->select('fname1')
                     ->where('dept', $dept)
                     ->where('semester', session('semester'))
                     ->from('subjects');
@@ -682,13 +697,22 @@
                         <!-- Hidden inputs for subject info; these must be set before showing the modal -->
                         <input type="hidden" name="subjectcode" id="subjectcode">
                         <input type="hidden" name="subjectname" id="subjectname">
+                        <input type="hidden" name="subjecttype" id="subjecttype">
                         <label for="facultySelect" class="form-label">Choose Faculty:</label>
-                        <select class="form-select" id="facultySelect" name="fid" required>
-                            <option selected disabled>Select a faculty</option>
-                            @foreach($facultyNotAssigned as $faculty)
-                                <option value="{{ $faculty->fid }}">{{ $faculty->name }}</option>
-                            @endforeach
-                        </select>
+                        <div id="facultySelectContainer">
+                            <select class="form-select mb-2" id="facultySelect1" name="fid1" required>
+                                <option selected disabled>Select a faculty</option>
+                                @foreach($facultyNotAssigned as $faculty)
+                                    <option value="{{ $faculty->fid }}">{{ $faculty->name }}</option>
+                                @endforeach
+                            </select>
+                            <select class="form-select" id="facultySelect2" name="fid2">
+                                <option selected disabled>Select a second faculty </option>
+                                @foreach($facultyNotAssigned as $faculty)
+                                    <option value="{{ $faculty->fid }}">{{ $faculty->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -817,14 +841,47 @@
         $(document).on('click', '.btn-primary[data-bs-target="#facultyModal"]', function () {
             const subjectcode = $(this).closest('tr').find('td:first').text().trim();
             const subjectname = $(this).closest('tr').find('td:nth-child(2)').text().trim();
+            const subjecttype = $(this).closest('tr').find('td:nth-child(4)').text().trim().toLowerCase();
+
             $('#subjectcode').val(subjectcode);
             $('#subjectname').val(subjectname);
+            $('#subjecttype').val(subjecttype);
+
+            // Enable or disable the second faculty dropdown based on subject type
+            if (subjecttype === 'lab') {
+                $('#facultySelect2').prop('disabled', false);
+            } else {
+                $('#facultySelect2').prop('disabled', false); // Allow two faculties for theory
+            }
         });
 
-        // On facultyModal form submission, send AJAX POST to assign the subject
+        // On facultyModal form submission, validate and send AJAX POST to assign the subject
         $('#assignSubjectForm').on('submit', function (e) {
             e.preventDefault();
-            var formData = $(this).serialize();
+
+            const subjecttype = $('#subjecttype').val();
+            const faculty1 = $('#facultySelect1').val();
+            const faculty2 = $('#facultySelect2').val();
+
+            // Validation: Ensure at least one faculty is selected
+            if (!faculty1) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'At least one faculty must be selected.',
+                    confirmButtonText: 'Ok'
+                });
+                return;
+            }
+
+            // If only one faculty is selected, set the second faculty to null
+            const formData = {
+                subjectcode: $('#subjectcode').val(),
+                subjectname: $('#subjectname').val(),
+                fid1: faculty1,
+                fid2: faculty2 || null // Set to null if not selected
+            };
+
             $.ajax({
                 url: "{{ route('subject.assign') }}",
                 type: "POST",

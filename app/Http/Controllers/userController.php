@@ -346,27 +346,32 @@ class userController extends Controller
         $data = $request->validate([
             'subjectcode' => 'required|string',
             'subjectname' => 'required|string',
-            'fid'         => 'required|string'
+            'fid1'        => 'required|string',
+            'fid2'        => 'nullable|string'
         ]);
-        // Retrieve additional values from session
+
         $cid      = session('cid');
         $dept     = session('dept');
         $batch    = session('batch');
         $sec      = session('sec');
         $semester = session('semester');
 
-        // Get faculty name for the provided fid
-        $faculty = DB::table('faculty')->where('fid', $data['fid'])->first();
-        if (!$faculty) {
-            return response()->json(['status' => 'error', 'message' => 'Faculty not found.'], 400);
+        // Get faculty names for the provided fids
+        $faculty1 = DB::table('faculty')->where('fid', $data['fid1'])->first();
+        $faculty2 = $data['fid2'] ? DB::table('faculty')->where('fid', $data['fid2'])->first() : null;
+
+        // Validation: Ensure at least one faculty is selected
+        if (!$faculty1) {
+            return response()->json(['status' => 'error', 'message' => 'At least one faculty must be selected.'], 400);
         }
 
-        // Insert record into subjects table with provided and session data
+        // Insert record into subjects table
         DB::table('subjects')->insert([
             'cid'         => $cid,
             'subjectcode' => $data['subjectcode'],
             'subjectname' => $data['subjectname'],
-            'fname'       => $faculty->name,
+            'fname1'      => $faculty1->name,
+            'fname2'      => $faculty2 ? $faculty2->name : null,
             'semester'    => $semester,
             'dept'        => $dept,
             'batch'       => $batch,
@@ -375,7 +380,7 @@ class userController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => "Faculty {$faculty->name} assigned to subject {$data['subjectname']}"
+            'message' => "Faculty {$faculty1->name}" . ($faculty2 ? " and {$faculty2->name}" : "") . " assigned to subject {$data['subjectname']}"
         ]);
     }
 
