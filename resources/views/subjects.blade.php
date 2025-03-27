@@ -619,6 +619,7 @@
             $('#coursesTable').DataTable({
                 // DataTable initialization options can be added here if needed
             });
+            $('#excelfile')[0].reset();
         });
         $('#addCourseForm').on('submit', function(e) {
             e.preventDefault();
@@ -678,6 +679,7 @@
                             text: response.message,
                             confirmButtonText: 'Ok'
                         });
+                        $('#excelfile')[0].reset();
                     } else if (response.status === 'success') {
                         Swal.fire({
                             icon: 'success',

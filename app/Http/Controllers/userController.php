@@ -153,8 +153,21 @@ class userController extends Controller
         $created_by = $request->session()->get('name');
         $dept = $request->session()->get('dept'); // Example: Use authenticated user ID
 
+        
         while (($row = fgetcsv($handle)) !== FALSE) {
-            if (count($row) == 4) { // Ensure all columns are present
+            if (count($row) == 4) { 
+                $exists = DB::table('courses')
+            ->where('subcode', $row[0])
+            ->where('dept', $dept)
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Course code {$row[0]} already exists"
+            ]);
+        }
+// Ensure all columns are present
                 DB::table('courses')->insert([
                     'subcode'  => $row[0],
                     'type'     => $row[1],
