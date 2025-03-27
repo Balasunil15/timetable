@@ -357,30 +357,19 @@
 
                     </div>
                     <div class="tab-pane fade" id="students" role="tabpanel" aria-labelledby="students-tab">
-                        <table id="studentsTable" class="table table-bordered text-center">
+                        <table id="studentsTable_{{ uniqid() }}" class="table table-bordered text-center">
                             <thead class="gradient-header">
                                 <tr>
                                     <th class="text-center">Subject Code</th>
                                     <th class="text-center">Subject Name</th>
+                                    <th class="text-center">faculty </th>
                                     <th class="text-center">Students List</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="text-center">SUB001</td>
-                                    <td class="text-center">Mathematics</td>
-                                    <td class="text-center"><button class="btn btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#studentsModal">Select Students</button></td>
-                                </tr>
-                                <tr>
-                                    <td class="text-center">SUB002</td>
-                                    <td class="text-center">Physics</td>
-                                    <td class="text-center"><button class="btn btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#studentsModal">Select Students</button></td>
-                                </tr>
+                            <tbody id="studentsTableBody">
+                                <!-- Dynamic content will be loaded here -->
                             </tbody>
                         </table>
-
                     </div>
                 </div>
             </div>
@@ -642,7 +631,7 @@
                             const studentItem = `
                                 <li class="list-group-item">
                                     <input type="checkbox" id="student${student.uid}" name="student${student.uid}">
-                                    <label for="student${student.uid}">${student.sname} (ID: ${student.uid})</label>
+                                    <label for="student${student.uid}">${student.sname} (${student.sid})</label>
                                 </li>
                             `;
                             if (index % 2 === 0) {
@@ -669,6 +658,53 @@
                     });
                 }
             });
+        });
+
+        // Fetch subjects dynamically for the students tab
+        $.ajax({
+            url: "{{ route('subjects.fetch') }}",
+            type: "GET",
+            success: function (response) {
+                if (response.status === 'success') {
+                    const subjects = response.data;
+                    const tableBody = $('#studentsTableBody');
+                    tableBody.empty();
+
+                    subjects.forEach(subject => {
+                        const row = `
+                            <tr>
+                                <td class="text-center">${subject.subjectcode}</td>
+                                <td class="text-center">${subject.subjectname}</td>
+                                <td class="text-center">${subject.fname1} ${subject.fname2 ? ', ' + subject.fname2 : ''}</td>
+                                <td class="text-center">
+                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentsModal" 
+                                        data-subjectcode="${subject.subjectcode}" 
+                                        data-subjectname="${subject.subjectname}">
+
+                                        Select Students
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                        tableBody.append(row);
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message,
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to fetch subjects. Please try again.',
+                    confirmButtonText: 'Ok'
+                });
+            }
         });
     </script>
 

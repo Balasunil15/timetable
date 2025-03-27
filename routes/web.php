@@ -62,3 +62,6 @@ Route::post('/subject/remove', [userController::class, 'removeSubject'])->name('
 
 // Updated route to use userController for fetching students
 Route::get('/students/fetch', [userController::class, 'fetchStudents'])->name('students.fetch');
+
+// Added route to fetch subjects dynamically for the students tab
+Route::get('/subjects/fetch', [userController::class, 'fetchSubjects'])->name('subjects.fetch');

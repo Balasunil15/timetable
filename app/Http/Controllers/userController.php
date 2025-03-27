@@ -418,7 +418,7 @@ class userController extends Controller
                 ->where('dept', $dept)
                 ->where('section', $section)
                 ->where('Batch', $batch)
-                ->get(['uid', 'sname']);
+                ->get(['uid', 'sname','sid']);
 
             return response()->json([
                 'status' => 'success',
@@ -428,6 +428,29 @@ class userController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to fetch students. Please try again.'
+            ]);
+        }
+    }
+
+    public function fetchSubjects(Request $request)
+    {
+        $dept = session('dept');
+        $cid = session('cid');
+
+        try {
+            $subjects = DB::table('subjects')
+                ->where('dept', $dept)
+                ->where('cid', $cid)
+                ->get(['subjectcode', 'subjectname', 'fname1', 'fname2']);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $subjects
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch subjects. Please try again.'
             ]);
         }
     }
