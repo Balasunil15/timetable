@@ -328,7 +328,8 @@
                                                                                 ->where('cid', session('cid'))
                                                                                 ->exists()
                                                                         )
-                                                                                                                <button class="btn btn-danger remove-subject-btn" data-subjectcode="{{ $course->subcode }}">Remove</button>
+                                                                                                                <button class="btn btn-danger remove-subject-btn"
+                                                                                                                    data-subjectcode="{{ $course->subcode }}">Remove</button>
                                                                         @else
                                                                             <button class="btn btn-primary" data-bs-toggle="modal"
                                                                                 data-bs-target="#facultyModal">Choose Faculty</button>
@@ -562,15 +563,15 @@
                 url: "{{ route('subject.remove') }}",
                 type: "POST",
                 data: { subjectcode: subjectcode },
-                success: function(response) {
-                    if(response.status === 'success') {
+                success: function (response) {
+                    if (response.status === 'success') {
                         Swal.fire({
                             icon: 'success',
                             title: 'Removed',
                             text: response.message,
                             confirmButtonText: 'Ok'
                         }).then((result) => {
-                            if(result.isConfirmed){
+                            if (result.isConfirmed) {
                                 location.reload();
                             }
                         });
@@ -583,7 +584,7 @@
                         });
                     }
                 },
-                error: function() {
+                error: function () {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -821,22 +822,22 @@
         });
 
         // On facultyModal form submission, send AJAX POST to assign the subject
-        $('#assignSubjectForm').on('submit', function(e) {
+        $('#assignSubjectForm').on('submit', function (e) {
             e.preventDefault();
             var formData = $(this).serialize();
             $.ajax({
                 url: "{{ route('subject.assign') }}",
                 type: "POST",
                 data: formData,
-                success: function(response) {
-                    if(response.status === 'success'){
+                success: function (response) {
+                    if (response.status === 'success') {
                         Swal.fire({
                             icon: 'success',
                             title: 'Success',
                             text: response.message,
                             confirmButtonText: 'Ok'
                         }).then((result) => {
-                            if(result.isConfirmed){
+                            if (result.isConfirmed) {
                                 location.reload();
                             }
                         });
@@ -849,7 +850,7 @@
                         });
                     }
                 },
-                error: function() {
+                error: function () {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
