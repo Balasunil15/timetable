@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+
+use Maatwebsite\Excel\Facades\Excel;
+
 
 class userController extends Controller
 {
@@ -25,7 +29,7 @@ class userController extends Controller
                 'name' => $faculty->name,
                 'dept' => $faculty->dept,
                 'role' => $faculty->role,
-                'advisor'=>$faculty->advisor
+                'advisor' => $faculty->advisor
             ]);
 
             // Redirect based on role
@@ -115,6 +119,73 @@ class userController extends Controller
             'message' => "Course {$courseName} successfully created"
         ]);
     }
+    public function storeCoursess(Request $request)
+    {
+        // Validate file input
+        $validator = Validator::make($request->all(), [
+            'import_file' => 'required|mimes:csv,txt|max:2048', // Validate file type
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid file format. Please upload a CSV file.',
+            ]);
+        }
+
+        $file = $request->file('import_file');
+        $filePath = $file->getRealPath();
+
+        // Read CSV file
+        $handle = fopen($filePath, "r");
+        $header = fgetcsv($handle);
+
+        // Expected headers
+        $expectedHeaders = ['subcode', 'type', 'subname', 'credits'];
+
+        if ($header !== $expectedHeaders) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid file format. Please use the correct template.',
+            ]);
+        }
+
+        $created_by = $request->session()->get('name');
+        $dept = $request->session()->get('dept'); // Example: Use authenticated user ID
+
+        
+        while (($row = fgetcsv($handle)) !== FALSE) {
+            if (count($row) == 4) { 
+                $exists = DB::table('courses')
+            ->where('subcode', $row[0])
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Course code {$row[0]} already exists"
+            ]);
+        }
+// Ensure all columns are present
+                DB::table('courses')->insert([
+                    'subcode'  => $row[0],
+                    'type'     => $row[1],
+                    'subname'  => $row[2],
+                    'credits'  => $row[3],
+                    'dept'     => $dept,
+                    'createdby' => $created_by,
+                    
+                ]);
+            }
+        }
+        fclose($handle);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Courses imported successfully!',
+        ]);
+    }
+
 
     public function updateCourse(Request $request)
     {
@@ -200,7 +271,7 @@ class userController extends Controller
             'fid'   => 'required|string'
         ]);
         $dept = $request->session()->get('dept');
-        
+
         // Check if an advisor record already exists for the given dept, batch, sec, and semester
         $exists = DB::table('advisor')
             ->where('dept', $dept)
@@ -214,7 +285,7 @@ class userController extends Controller
                 'message' => 'Advisor record already exists for the specified batch, section, and semester.'
             ]);
         }
-        
+
         // Get the chosen faculty record to retrieve advisor name
         $faculty = DB::table('faculty')
             ->where('fid', $data['fid'])
@@ -223,7 +294,7 @@ class userController extends Controller
         if (!$faculty) {
             return response()->json(['status' => 'error', 'message' => 'Faculty not found.']);
         }
-        
+
         // Insert advisor record including semester
         DB::table('advisor')->insert([
             'dept'        => $dept,
@@ -431,6 +502,7 @@ class userController extends Controller
             ]);
         }
     }
+<<<<<<< HEAD
 
     public function fetchSubjects(Request $request)
     {
@@ -455,4 +527,6 @@ class userController extends Controller
         }
     }
 
+=======
+>>>>>>> 2e6635a57e3b52fe2274cc86360f3f6b15b73ee6
 }
