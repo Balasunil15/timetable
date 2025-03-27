@@ -54,6 +54,7 @@ Route::post('/advisor/update', [userController::class, 'updateAdvisor'])->name('
 
 Route::get('/advisorsubjects', [userController::class, 'advisorsubjects'])->name('advisorsubjects');
 Route::get('/studentslist', [userController::class, 'studentslist'])->name('studentslist');
+Route::get('/timetable', [userController::class, 'timetable'])->name('timetable');
 
 // Added route for assigning subject
 Route::post('/subject/assign', [userController::class, 'assignSubject'])->name('subject.assign');
