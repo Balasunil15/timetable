@@ -79,7 +79,9 @@ class userController extends Controller
             ->where('dept', $dept)
             ->get();
 
-        return view('subjects', compact('courses'));
+        return response()->view('subjects', compact('courses'))->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        ->header('Pragma', 'no-cache')
+        ->header('Expires', '0');
     }
 
     public function storeCourse(Request $request)
@@ -257,7 +259,9 @@ class userController extends Controller
             ->where('role', 'faculty')
             ->where('advisor', '!=', 1)
             ->get();
-        return view('advisors', compact('sections', 'advisorRecords', 'facultyList'));
+        return response()->view('advisors', compact('sections', 'advisorRecords', 'facultyList'))->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        ->header('Pragma', 'no-cache')
+        ->header('Expires', '0');
     }
 
     public function storeAdvisor(Request $request)
@@ -395,7 +399,9 @@ class userController extends Controller
             ->where('semester', $semester)
             ->get();
 
-        return view('students', compact('students'));
+        return response()->view('students', compact('students'))->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        ->header('Pragma', 'no-cache')
+        ->header('Expires', '0');
     }
 
     public function advisorsubjects(Request $request)
@@ -408,7 +414,9 @@ class userController extends Controller
             ->select('subcode', 'subname', 'credits', 'type')
             ->where('dept', $dept)
             ->get();
-        return view('advisorsubjects', compact('courses'));
+        return response()->view('advisorsubjects', compact('courses'))->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        ->header('Pragma', 'no-cache')
+        ->header('Expires', '0');
     }
 
     public function assignSubject(Request $request)
