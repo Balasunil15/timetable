@@ -502,7 +502,7 @@ class userController extends Controller
             ]);
         }
     }
-<<<<<<< HEAD
+
 
     public function fetchSubjects(Request $request)
     {
@@ -527,6 +527,4 @@ class userController extends Controller
         }
     }
 
-=======
->>>>>>> 2e6635a57e3b52fe2274cc86360f3f6b15b73ee6
 }
