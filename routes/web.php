@@ -48,6 +48,7 @@ Route::get('/subjects', [userController::class, 'subjects'])->name('subjects');
 Route::post('/subjects/store', [userController::class, 'storeCourse'])->name('subjects.store');
 Route::post('/subjects/update', [userController::class, 'updateCourse'])->name('subjects.update');
 Route::post('/subjects/delete', [userController::class, 'deleteCourse'])->name('subjects.delete');
+Route::post('/subjects/import', [userController::class, 'storeCoursess'])->name('courses.import');
 
 // Advisor Management Routes
 Route::get('/advisors', [userController::class, 'advisors'])->name('advisors');

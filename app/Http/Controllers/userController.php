@@ -153,28 +153,28 @@ class userController extends Controller
         $created_by = $request->session()->get('name');
         $dept = $request->session()->get('dept'); // Example: Use authenticated user ID
 
-        
-        while (($row = fgetcsv($handle)) !== FALSE) {
-            if (count($row) == 4) { 
-                $exists = DB::table('courses')
-            ->where('subcode', $row[0])
-            ->exists();
 
-        if ($exists) {
-            return response()->json([
-                'status' => 'error',
-                'message' => "Course code {$row[0]} already exists"
-            ]);
-        }
-// Ensure all columns are present
+        while (($row = fgetcsv($handle)) !== FALSE) {
+            if (count($row) == 4) {
+                $exists = DB::table('courses')
+                    ->where('subcode', $row[0])
+                    ->exists();
+
+                if ($exists) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => "Course code {$row[0]} already exists"
+                    ]);
+                }
+                // Ensure all columns are present
                 DB::table('courses')->insert([
-                    'subcode'  => $row[0],
-                    'type'     => $row[1],
-                    'subname'  => $row[2],
-                    'credits'  => $row[3],
-                    'dept'     => $dept,
+                    'subcode' => $row[0],
+                    'type' => $row[1],
+                    'subname' => $row[2],
+                    'credits' => $row[3],
+                    'dept' => $dept,
                     'createdby' => $created_by,
-                    
+
                 ]);
             }
         }
@@ -185,7 +185,6 @@ class userController extends Controller
             'message' => 'Courses imported successfully!',
         ]);
     }
-
 
     public function updateCourse(Request $request)
     {
@@ -266,9 +265,9 @@ class userController extends Controller
         // Validate input using batch, sec, sem, and fid
         $data = $request->validate([
             'batch' => 'required|string',
-            'sec'   => 'required|string',
-            'sem'   => 'required|string',
-            'fid'   => 'required|string'
+            'sec' => 'required|string',
+            'sem' => 'required|string',
+            'fid' => 'required|string'
         ]);
         $dept = $request->session()->get('dept');
 
@@ -297,10 +296,10 @@ class userController extends Controller
 
         // Insert advisor record including semester
         DB::table('advisor')->insert([
-            'dept'        => $dept,
-            'batch'       => $data['batch'],
-            'sec'         => $data['sec'],
-            'semester'    => $data['sem'],
+            'dept' => $dept,
+            'batch' => $data['batch'],
+            'sec' => $data['sec'],
+            'semester' => $data['sem'],
             'advisorname' => $faculty->name
         ]);
         // Update faculty table: set advisor = 1 for chosen faculty
@@ -313,9 +312,9 @@ class userController extends Controller
         // Validate input using batch, sec, sem and fid
         $data = $request->validate([
             'batch' => 'required|string',
-            'sec'   => 'required|string',
-            'sem'   => 'required|string',
-            'fid'   => 'required|string'
+            'sec' => 'required|string',
+            'sem' => 'required|string',
+            'fid' => 'required|string'
         ]);
         $dept = $request->session()->get('dept');
 
@@ -417,14 +416,14 @@ class userController extends Controller
         $data = $request->validate([
             'subjectcode' => 'required|string',
             'subjectname' => 'required|string',
-            'fid1'        => 'required|string',
-            'fid2'        => 'nullable|string'
+            'fid1' => 'required|string',
+            'fid2' => 'nullable|string'
         ]);
 
-        $cid      = session('cid');
-        $dept     = session('dept');
-        $batch    = session('batch');
-        $sec      = session('sec');
+        $cid = session('cid');
+        $dept = session('dept');
+        $batch = session('batch');
+        $sec = session('sec');
         $semester = session('semester');
 
         // Get faculty names for the provided fids
@@ -438,15 +437,15 @@ class userController extends Controller
 
         // Insert record into subjects table
         DB::table('subjects')->insert([
-            'cid'         => $cid,
+            'cid' => $cid,
             'subjectcode' => $data['subjectcode'],
             'subjectname' => $data['subjectname'],
-            'fname1'      => $faculty1->name,
-            'fname2'      => $faculty2 ? $faculty2->name : null,
-            'semester'    => $semester,
-            'dept'        => $dept,
-            'batch'       => $batch,
-            'sec'         => $sec
+            'fname1' => $faculty1->name,
+            'fname2' => $faculty2 ? $faculty2->name : null,
+            'semester' => $semester,
+            'dept' => $dept,
+            'batch' => $batch,
+            'sec' => $sec
         ]);
 
         return response()->json([
@@ -489,7 +488,7 @@ class userController extends Controller
                 ->where('dept', $dept)
                 ->where('section', $section)
                 ->where('Batch', $batch)
-                ->get(['uid', 'sname','sid']);
+                ->get(['uid', 'sname', 'sid']);
 
             return response()->json([
                 'status' => 'success',

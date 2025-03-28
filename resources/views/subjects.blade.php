@@ -310,37 +310,25 @@
                 <!-- Import File Card -->
                 <div class="col-md-6">
                     <div class="card h-100">
-                        <div
-                            class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">Import Multiple Courses</h5>
-                            <i class="fas fa-question-circle" data-bs-toggle="tooltip"
-                                title="Upload CSV file with multiple courses"></i>
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Import Courses</h5>
                         </div>
-                        <div class="card-body d-flex flex-column">
-                            <div class="alert alert-info">
-                                <h6><i class="fas fa-info-circle"></i> Instructions:</h6>
-                                <ol class="mb-0">
-                                    <li>Download the <a href="#" class="alert-link">sample template</a></li>
-                                    <li>Fill in your course details</li>
-                                    <li>Save as CSV file</li>
-                                    <li>Upload the file below</li>
-                                </ol>
-                            </div>
-                            <form id="excelfile" class="mt-3">
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">
-                                        <i class="fas fa-file-csv"></i> Choose CSV File
-                                    </label>
-                                    <input type="file" class="form-control" id="importFile" name="import_file"
-                                        accept=".csv" required>
-                                    <div class="form-text">
-                                        <i class="fas fa-exclamation-triangle text-warning"></i>
-                                        File must contain: subcode, type, subname, credits
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <form id="excelfile" class="h-100 d-flex flex-column">
+                                <div class="flex-grow-1">
+                                    <div class="mb-3">
+                                        <label for="importFile" class="form-label">Choose CSV File</label>
+                                        <input type="file" class="form-control" id="importFile" name="import_file"
+                                            accept=".csv" required>
                                     </div>
+                                    <p class="text-muted small">
+                                        Supported format: CSV<br>
+                                        Required columns: subcode, type, subname, credits<br>
+                                        Maximum file size: 2MB
+                                    </p>
                                 </div>
-                                <button type="submit" name="import" class="btn btn-success w-100">
-                                    <i class="fas fa-file-import"></i> Import Courses
-                                </button>
+                                <button type="submit" name="import" class="btn btn-success w-100 mt-auto">Import
+                                    Courses</button>
                             </form>
                         </div>
                     </div>
@@ -349,54 +337,34 @@
                 <!-- Add Course Card -->
                 <div class="col-md-6">
                     <div class="card h-100">
-                        <div
-                            class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">Add Single Course</h5>
-                            <i class="fas fa-question-circle" data-bs-toggle="tooltip"
-                                title="Add a single course manually"></i>
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Add New Course</h5>
                         </div>
                         <div class="card-body">
-                            <div class="alert alert-info mb-3">
-                                <i class="fas fa-info-circle"></i> Fill in all fields to add a new course
-                            </div>
                             <form id="addCourseForm">
                                 <div class="mb-3">
-                                    <label for="courseCode" class="form-label fw-bold">
-                                        <i class="fas fa-fingerprint"></i> Course Code
-                                    </label>
-                                    <input type="text" class="form-control" id="courseCode" name="courseCode" required
-                                        placeholder="e.g., CS101">
-                                    <div class="form-text">Unique identifier for the course</div>
+                                    <label for="courseCode" class="form-label">Course Code</label>
+                                    <input type="text" class="form-control" id="courseCode" name="courseCode" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="courseName" class="form-label fw-bold">
-                                        <i class="fas fa-book"></i> Course Name
-                                    </label>
-                                    <input type="text" class="form-control" id="courseName" name="courseName" required
-                                        placeholder="e.g., Introduction to Programming">
+                                    <label for="courseName" class="form-label">Course Name</label>
+                                    <input type="text" class="form-control" id="courseName" name="courseName" required>
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label for="courseCredits" class="form-label fw-bold">
-                                            <i class="fas fa-star"></i> Credits
-                                        </label>
+                                        <label for="courseCredits" class="form-label">Credits</label>
                                         <input type="number" class="form-control" id="courseCredits"
-                                            name="courseCredits" required min="1" max="5" placeholder="1-5">
+                                            name="courseCredits" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="courseType" class="form-label fw-bold">
-                                            <i class="fas fa-layer-group"></i> Type
-                                        </label>
+                                        <label for="courseType" class="form-label">Type</label>
                                         <select class="form-select" id="courseType" name="courseType" required>
-                                            <option value="" disabled selected>Select type</option>
                                             <option value="Theory">Theory</option>
                                             <option value="Lab">Lab</option>
                                         </select>
                                     </div>
                                 </div>
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="fas fa-plus-circle"></i> Add Course
-                                </button>
+                                <button type="submit" class="btn btn-primary w-100">Add Course</button>
                             </form>
                         </div>
                     </div>
