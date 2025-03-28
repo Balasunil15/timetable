@@ -311,7 +311,7 @@
                 <div class="col-md-6">
                     <div class="card h-100">
                         <div class="card-header bg-primary text-white">
-                            <h5 class="card-title mb-0">Import Courses</h5>
+                            <h5 class="card-title mb-0">Add Multiple Courses</h5>
                         </div>
                         <div class="card-body d-flex flex-column justify-content-between">
                             <form id="excelfile" class="h-100 d-flex flex-column">
@@ -338,7 +338,7 @@
                 <div class="col-md-6">
                     <div class="card h-100">
                         <div class="card-header bg-primary text-white">
-                            <h5 class="card-title mb-0">Add New Course</h5>
+                            <h5 class="card-title mb-0">Add Single Course</h5>
                         </div>
                         <div class="card-body">
                             <form id="addCourseForm">
