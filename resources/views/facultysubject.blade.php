@@ -387,23 +387,27 @@
                     </div>
                     <div class="modal-body">
                         <p id="modalInfo"></p>
-                        <div class="mb-3">
-                            <label for="subjectSelect" class="form-label">Select Subject:</label>
-                            <select class="form-select" id="subjectSelect">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="subjectSelect" class="form-label">Select Subject 1:</label>
+                                <select class="form-select" id="subjectSelect">
+                                    <option value="Math">Mathematics</option>
+                                    <option value="Physics">Physics</option>
+                                    <option value="Chemistry">Chemistry</option>
+                                    <option value="Biology">Biology</option>
+                                    <option value="English">English</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="facultySelect" class="form-label">Select subject 2:</label>
+                                <select class="form-select" id="facultySelect">
                                 <option value="Math">Mathematics</option>
-                                <option value="Physics">Physics</option>
-                                <option value="Chemistry">Chemistry</option>
-                                <option value="Biology">Biology</option>
-                                <option value="English">English</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="facultySelect" class="form-label">Select Faculty:</label>
-                            <select class="form-select" id="facultySelect">
-                                <option value="faculty1">Faculty 1</option>
-                                <option value="faculty2">Faculty 2</option>
-                                <option value="faculty3">Faculty 3</option>
-                            </select>
+                                    <option value="Physics">Physics</option>
+                                    <option value="Chemistry">Chemistry</option>
+                                    <option value="Biology">Biology</option>
+                                    <option value="English">English</option>
+                                    </select>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">

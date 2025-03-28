@@ -45,7 +45,6 @@ Route::get('/logout', [userController::class, 'logout'])->name('logout');
 // Added routes for subjects and advisors
 Route::get('/subjects', [userController::class, 'subjects'])->name('subjects');
 Route::post('/subjects/store', [userController::class, 'storeCourse'])->name('subjects.store');
-Route::post('/courses/import', [userController::class, 'storeCoursess'])->name('courses.import');
 Route::post('/subjects/update', [userController::class, 'updateCourse'])->name('subjects.update');
 Route::post('/subjects/delete', [userController::class, 'deleteCourse'])->name('subjects.delete');
 Route::get('/advisors', [userController::class, 'advisors'])->name('advisors');
@@ -55,7 +54,6 @@ Route::post('/advisor/update', [userController::class, 'updateAdvisor'])->name('
 
 Route::get('/advisorsubjects', [userController::class, 'advisorsubjects'])->name('advisorsubjects');
 Route::get('/studentslist', [userController::class, 'studentslist'])->name('studentslist');
-Route::get('/timetable', [userController::class, 'timetable'])->name('timetable');
 
 // Added route for assigning subject
 Route::post('/subject/assign', [userController::class, 'assignSubject'])->name('subject.assign');
@@ -64,5 +62,7 @@ Route::post('/subject/remove', [userController::class, 'removeSubject'])->name('
 // Updated route to use userController for fetching students
 Route::get('/students/fetch', [userController::class, 'fetchStudents'])->name('students.fetch');
 
-// Added route to fetch subjects dynamically for the students tab
-Route::get('/subjects/fetch', [userController::class, 'fetchSubjects'])->name('subjects.fetch');
+
+Route::get('/timetable', function () {
+    return view('facultysubject');
+})->name('timetable');
