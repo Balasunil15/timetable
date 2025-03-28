@@ -306,38 +306,43 @@
         <!-- Content Area -->
         <div class="container-fluid">
             <div class="custom-tabs">
-
+                <form id="excelfile">
+                    <input type="file" name="import_file" accept=".csv" required>
+                    <button type="submit" name="import" class="btn btn-success">Import</button>
+                </form>
                 <div class="d-flex justify-content-end mb-3">
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCourseModal">Add
+
+                    <button class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#addCourseModal">Add
                         Course</button>
+
                 </div>
                 <!-- DataTable -->
                 <table id="coursesTable" class="table table-striped table-bordered">
                     <thead class="gradient-header">
                         <tr>
-                            <th>Course Code</th>
-                            <th>Course Name</th>
-                            <th>Credits</th>
-                            <th>Type</th>
-                            <th>Action</th>
+                            <th class="text-center">Course Code</th>
+                            <th class="text-center">Course Name</th>
+                            <th class="text-center">Credits</th>
+                            <th class="text-center">Type</th>
+                            <th class="text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($courses as $course)
-                            <tr>
-                                <td>{{ $course->courseCode }}</td>
-                                <td>{{ $course->courseName }}</td>
-                                <td>{{ $course->credits }}</td>
-                                <td>{{ $course->type }}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-warning edit-btn"
-                                        data-course-code="{{ $course->courseCode }}"
-                                        data-course-name="{{ $course->courseName }}" data-credits="{{ $course->credits }}"
-                                        data-type="{{ $course->type }}">Edit</button>
-                                    <button class="btn btn-sm btn-danger delete-btn"
-                                        data-course-code="{{ $course->courseCode }}">Delete</button>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td class="text-center">{{ $course->courseCode }}</td>
+                            <td class="text-center">{{ $course->courseName }}</td>
+                            <td class="text-center">{{ $course->credits }}</td>
+                            <td class="text-center">{{ $course->type }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning edit-btn"
+                                    data-course-code="{{ $course->courseCode }}"
+                                    data-course-name="{{ $course->courseName }}" data-credits="{{ $course->credits }}"
+                                    data-type="{{ $course->type }}">Edit</button>
+                                <button class="btn btn-sm btn-danger delete-btn"
+                                    data-course-code="{{ $course->courseCode }}">Delete</button>
+                            </td>
+                        </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -430,7 +435,6 @@
         @include ('footer')
     </div>
     <script>
-
         const loaderContainer = document.getElementById('loaderContainer');
 
         function showLoader() {
@@ -442,7 +446,7 @@
         }
 
         //    automatic loader
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const loaderContainer = document.getElementById('loaderContainer');
             let loadingTimeout;
 
@@ -459,7 +463,7 @@
             loadingTimeout = setTimeout(showError, 10000);
 
             // Hide loader when everything is loaded
-            window.onload = function () {
+            window.onload = function() {
                 clearTimeout(loadingTimeout);
 
                 // Add a small delay to ensure smooth transition
@@ -467,14 +471,14 @@
             };
 
             // Error handling
-            window.onerror = function (msg, url, lineNo, columnNo, error) {
+            window.onerror = function(msg, url, lineNo, columnNo, error) {
                 clearTimeout(loadingTimeout);
                 showError();
                 return false;
             };
         });
 
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             // Cache DOM elements
             const elements = {
                 hamburger: document.getElementById('hamburger'),
@@ -577,7 +581,8 @@
                     submenuItems.forEach(submenuItem => {
                         submenuItem.addEventListener('click', (e) => {
                             // Remove active class from all submenu items
-                            submenuItems.forEach(si => si.classList.remove('active'));
+                            submenuItems.forEach(si => si.classList.remove(
+                                'active'));
                             // Add active class to clicked submenu item
                             submenuItem.classList.add('active');
                             e.stopPropagation(); // Prevent event from bubbling up
@@ -609,20 +614,21 @@
         });
 
 
-        $(document).ready(function () {
+        $(document).ready(function() {
             // Initialize DataTable using existing courses displayed via Blade loop
             $('#coursesTable').DataTable({
                 // DataTable initialization options can be added here if needed
             });
+            $('#excelfile')[0].reset();
         });
-        $('#addCourseForm').on('submit', function (e) {
+        $('#addCourseForm').on('submit', function(e) {
             e.preventDefault();
             var formData = $(this).serialize();
             $.ajax({
                 url: "{{ route('subjects.store') }}",
                 type: "POST",
                 data: formData,
-                success: function (response) {
+                success: function(response) {
                     if (response.status === 'error') {
                         Swal.fire({
                             icon: 'warning',
@@ -645,7 +651,51 @@
                         });
                     }
                 },
-                error: function () {
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while processing your request.',
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            });
+        });
+        $('#excelfile').on('submit', function(e) {
+            e.preventDefault();
+
+            var formData = new FormData(this); // Use FormData for file uploads
+            $.ajax({
+                 url: "{{ route('courses.import') }}",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status === 'error') {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Oops...',
+                            text: response.message,
+                            confirmButtonText: 'Ok'
+                        });
+                        $('#excelfile')[0].reset();
+                    } else if (response.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message,
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $('#addCourseModal').modal('hide');
+                                $('#excelfile')[0].reset(); // Reset form
+                                // Optionally, refresh the DataTable
+                            }
+                        });
+                    }
+                },
+                error: function() {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -656,8 +706,9 @@
             });
         });
 
+
         // Handle Edit button click
-        $('.edit-btn').on('click', function () {
+        $('.edit-btn').on('click', function() {
             const btn = $(this);
             $('#editCourseCode').val(btn.data('course-code'));
             $('#editCourseName').val(btn.data('course-name'));
@@ -667,14 +718,14 @@
         });
 
         // Handle Edit Course Form submission
-        $('#editCourseForm').on('submit', function (e) {
+        $('#editCourseForm').on('submit', function(e) {
             e.preventDefault();
             var formData = $(this).serialize();
             $.ajax({
                 url: "{{ route('subjects.update') }}",
                 type: "POST",
                 data: formData,
-                success: function (response) {
+                success: function(response) {
                     if (response.status === 'error') {
                         Swal.fire({
                             icon: 'warning',
@@ -700,7 +751,7 @@
                         });
                     }
                 },
-                error: function () {
+                error: function() {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -712,7 +763,7 @@
         });
 
         // Handle Delete button click
-        $('.delete-btn').on('click', function () {
+        $('.delete-btn').on('click', function() {
             var courseCode = $(this).data('course-code');
             Swal.fire({
                 title: "Are you sure?",
@@ -725,8 +776,10 @@
                     $.ajax({
                         url: "{{ route('subjects.delete') }}",
                         type: "POST",
-                        data: { courseCode: courseCode },
-                        success: function (response) {
+                        data: {
+                            courseCode: courseCode
+                        },
+                        success: function(response) {
                             if (response.status === 'success') {
                                 Swal.fire({
                                     icon: 'success',
@@ -744,7 +797,7 @@
                                 });
                             }
                         },
-                        error: function () {
+                        error: function() {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
@@ -756,7 +809,6 @@
                 }
             });
         });
-
     </script>
 
 </body>

@@ -15,7 +15,7 @@
         color: #333;
     }
 
-    p .login-container {
+     .login-container {
         display: flex;
         justify-content: center;
         align-items: center;

@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+
+use Maatwebsite\Excel\Facades\Excel;
+
 
 class userController extends Controller
 {
@@ -25,7 +29,7 @@ class userController extends Controller
                 'name' => $faculty->name,
                 'dept' => $faculty->dept,
                 'role' => $faculty->role,
-                'advisor'=>$faculty->advisor
+                'advisor' => $faculty->advisor
             ]);
 
             // Redirect based on role
@@ -115,6 +119,73 @@ class userController extends Controller
             'message' => "Course {$courseName} successfully created"
         ]);
     }
+    public function storeCoursess(Request $request)
+    {
+        // Validate file input
+        $validator = Validator::make($request->all(), [
+            'import_file' => 'required|mimes:csv,txt|max:2048', // Validate file type
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid file format. Please upload a CSV file.',
+            ]);
+        }
+
+        $file = $request->file('import_file');
+        $filePath = $file->getRealPath();
+
+        // Read CSV file
+        $handle = fopen($filePath, "r");
+        $header = fgetcsv($handle);
+
+        // Expected headers
+        $expectedHeaders = ['subcode', 'type', 'subname', 'credits'];
+
+        if ($header !== $expectedHeaders) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid file format. Please use the correct template.',
+            ]);
+        }
+
+        $created_by = $request->session()->get('name');
+        $dept = $request->session()->get('dept'); // Example: Use authenticated user ID
+
+        
+        while (($row = fgetcsv($handle)) !== FALSE) {
+            if (count($row) == 4) { 
+                $exists = DB::table('courses')
+            ->where('subcode', $row[0])
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Course code {$row[0]} already exists"
+            ]);
+        }
+// Ensure all columns are present
+                DB::table('courses')->insert([
+                    'subcode'  => $row[0],
+                    'type'     => $row[1],
+                    'subname'  => $row[2],
+                    'credits'  => $row[3],
+                    'dept'     => $dept,
+                    'createdby' => $created_by,
+                    
+                ]);
+            }
+        }
+        fclose($handle);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Courses imported successfully!',
+        ]);
+    }
+
 
     public function updateCourse(Request $request)
     {
@@ -200,7 +271,7 @@ class userController extends Controller
             'fid'   => 'required|string'
         ]);
         $dept = $request->session()->get('dept');
-        
+
         // Check if an advisor record already exists for the given dept, batch, sec, and semester
         $exists = DB::table('advisor')
             ->where('dept', $dept)
@@ -214,7 +285,7 @@ class userController extends Controller
                 'message' => 'Advisor record already exists for the specified batch, section, and semester.'
             ]);
         }
-        
+
         // Get the chosen faculty record to retrieve advisor name
         $faculty = DB::table('faculty')
             ->where('fid', $data['fid'])
@@ -223,7 +294,7 @@ class userController extends Controller
         if (!$faculty) {
             return response()->json(['status' => 'error', 'message' => 'Faculty not found.']);
         }
-        
+
         // Insert advisor record including semester
         DB::table('advisor')->insert([
             'dept'        => $dept,
@@ -346,27 +417,32 @@ class userController extends Controller
         $data = $request->validate([
             'subjectcode' => 'required|string',
             'subjectname' => 'required|string',
-            'fid'         => 'required|string'
+            'fid1'        => 'required|string',
+            'fid2'        => 'nullable|string'
         ]);
-        // Retrieve additional values from session
+
         $cid      = session('cid');
         $dept     = session('dept');
         $batch    = session('batch');
         $sec      = session('sec');
         $semester = session('semester');
 
-        // Get faculty name for the provided fid
-        $faculty = DB::table('faculty')->where('fid', $data['fid'])->first();
-        if (!$faculty) {
-            return response()->json(['status' => 'error', 'message' => 'Faculty not found.'], 400);
+        // Get faculty names for the provided fids
+        $faculty1 = DB::table('faculty')->where('fid', $data['fid1'])->first();
+        $faculty2 = $data['fid2'] ? DB::table('faculty')->where('fid', $data['fid2'])->first() : null;
+
+        // Validation: Ensure at least one faculty is selected
+        if (!$faculty1) {
+            return response()->json(['status' => 'error', 'message' => 'At least one faculty must be selected.'], 400);
         }
 
-        // Insert record into subjects table with provided and session data
+        // Insert record into subjects table
         DB::table('subjects')->insert([
             'cid'         => $cid,
             'subjectcode' => $data['subjectcode'],
             'subjectname' => $data['subjectname'],
-            'fname'       => $faculty->name,
+            'fname1'      => $faculty1->name,
+            'fname2'      => $faculty2 ? $faculty2->name : null,
             'semester'    => $semester,
             'dept'        => $dept,
             'batch'       => $batch,
@@ -375,7 +451,7 @@ class userController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => "Faculty {$faculty->name} assigned to subject {$data['subjectname']}"
+            'message' => "Faculty {$faculty1->name}" . ($faculty2 ? " and {$faculty2->name}" : "") . " assigned to subject {$data['subjectname']}"
         ]);
     }
 
@@ -413,7 +489,7 @@ class userController extends Controller
                 ->where('dept', $dept)
                 ->where('section', $section)
                 ->where('Batch', $batch)
-                ->get(['uid', 'sname']);
+                ->get(['uid', 'sname','sid']);
 
             return response()->json([
                 'status' => 'success',
@@ -423,6 +499,29 @@ class userController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to fetch students. Please try again.'
+            ]);
+        }
+    }
+
+    public function fetchSubjects(Request $request)
+    {
+        $dept = session('dept');
+        $cid = session('cid');
+
+        try {
+            $subjects = DB::table('subjects')
+                ->where('dept', $dept)
+                ->where('cid', $cid)
+                ->get(['subjectcode', 'subjectname', 'fname1', 'fname2']);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $subjects
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch subjects. Please try again.'
             ]);
         }
     }

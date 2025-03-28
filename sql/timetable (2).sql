@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 26, 2025 at 06:04 AM
+-- Generation Time: Mar 27, 2025 at 05:07 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -41,7 +41,8 @@ CREATE TABLE `advisor` (
 --
 
 INSERT INTO `advisor` (`cid`, `dept`, `batch`, `sec`, `semester`, `advisorname`) VALUES
-(11, 'Computer Science and Engineering', '2022-2026', 'B', 6, 'Prof. Grace Hopper');
+(11, 'Computer Science and Engineering', '2022-2026', 'B', 6, 'Prof. Grace Hopper'),
+(12, 'Computer Science and Engineering', '2022-2026', 'A', 6, 'Prof. Donald Knuth');
 
 -- --------------------------------------------------------
 
@@ -101,7 +102,7 @@ INSERT INTO `faculty` (`id`, `fid`, `name`, `dept`, `role`, `password`, `advisor
 (7, 1000007, 'Dr. Michael Lee', 'Computer Science and Business Systems', 'hod', 'hodcsbs', 0),
 (8, 2000001, 'Prof. Alan Turing', 'Computer Science and Engineering', 'faculty', 'csfac1', 0),
 (9, 2000002, 'Prof. Grace Hopper', 'Computer Science and Engineering', 'faculty', 'csfac2', 1),
-(10, 2000003, 'Prof. Donald Knuth', 'Computer Science and Engineering', 'faculty', 'csfac3', 0),
+(10, 2000003, 'Prof. Donald Knuth', 'Computer Science and Engineering', 'faculty', 'csfac3', 1),
 (11, 2000004, 'Prof. Ada Lovelace', 'Computer Science and Engineering', 'faculty', 'csfac4', 0),
 (12, 2000005, 'Prof. Linus Torvalds', 'Computer Science and Engineering', 'faculty', 'csfac5', 0),
 (13, 2000006, 'Prof. Tim Berners-Lee', 'Computer Science and Engineering', 'faculty', 'csfac6', 0),
@@ -250,9 +251,9 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('727RJhraNtCohwNLMevgfdASj4XcTdtFXqInaNUP', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0', 'YTozOntzOjk6Il9wcmV2aW91cyI7YToxOntzOjM6InVybCI7czoyNzoiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2xvZ2luIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo2OiJfdG9rZW4iO3M6NDA6IlZuU2lOQWZtVldoVGdldm13alJPSURnYTU5UUZBY29PdG1ydmxKcTEiO30=', 1742901692),
-('BmK1MHQtjZpzZoPiVqEWyN1PvkETpBWJwnDN1IqV', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiYThIVjBaVEVoWEpRQkJRM1Yxb0NLUnJJdTl3VFNKUFJBY3l6bnZ0QyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzQ6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9zdHVkZW50c2xpc3QiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1742894191),
-('WAwntRNLCiNOhxzlniJRPoV6SL2LINNVyhuXFIWp', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0', 'YToxMjp7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZHZpc29yc3ViamVjdHMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjY6Il90b2tlbiI7czo0MDoiaGMyQ1FlaXdmTTZkZHN1cUp2Z2R5ZHQzekh2bkJRWWVIVDZVNXA5byI7czozOiJmaWQiO2k6MjAwMDAwMjtzOjQ6Im5hbWUiO3M6MTg6IlByb2YuIEdyYWNlIEhvcHBlciI7czo0OiJkZXB0IjtzOjMyOiJDb21wdXRlciBTY2llbmNlIGFuZCBFbmdpbmVlcmluZyI7czo0OiJyb2xlIjtzOjc6ImZhY3VsdHkiO3M6NzoiYWR2aXNvciI7aToxO3M6MzoiY2lkIjtpOjExO3M6NToiYmF0Y2giO3M6OToiMjAyMi0yMDI2IjtzOjM6InNlYyI7czoxOiJCIjtzOjg6InNlbWVzdGVyIjtpOjY7fQ==', 1742965366);
+('fKKCrjovsDSnI1ctiRykjEUxcxOVQ4PhdAO0NecD', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0', 'YToxMjp7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZHZpc29yc3ViamVjdHMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjY6Il90b2tlbiI7czo0MDoiTmd5RDlhdDJncVJLQjQ1T0F4QUtad0xQdGhic3FaN2F4WEtlMFpHVyI7czozOiJmaWQiO2k6MjAwMDAwMjtzOjQ6Im5hbWUiO3M6MTg6IlByb2YuIEdyYWNlIEhvcHBlciI7czo0OiJkZXB0IjtzOjMyOiJDb21wdXRlciBTY2llbmNlIGFuZCBFbmdpbmVlcmluZyI7czo0OiJyb2xlIjtzOjc6ImZhY3VsdHkiO3M6NzoiYWR2aXNvciI7aToxO3M6MzoiY2lkIjtpOjExO3M6NToiYmF0Y2giO3M6OToiMjAyMi0yMDI2IjtzOjM6InNlYyI7czoxOiJCIjtzOjg6InNlbWVzdGVyIjtpOjY7fQ==', 1742988907),
+('KJC0bB4yHonr36gjYRyklyzIw2EsA2wZLcjgi3aw', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0', 'YToxMjp7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZHZpc29yc3ViamVjdHMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjY6Il90b2tlbiI7czo0MDoiRWhTU0ZlRm1ka0pRYkJsb2ptNU9CaVJmdFExdU40cGFYQkVFM09uTiI7czozOiJmaWQiO2k6MjAwMDAwMztzOjQ6Im5hbWUiO3M6MTg6IlByb2YuIERvbmFsZCBLbnV0aCI7czo0OiJkZXB0IjtzOjMyOiJDb21wdXRlciBTY2llbmNlIGFuZCBFbmdpbmVlcmluZyI7czo0OiJyb2xlIjtzOjc6ImZhY3VsdHkiO3M6NzoiYWR2aXNvciI7aToxO3M6MzoiY2lkIjtpOjEyO3M6NToiYmF0Y2giO3M6OToiMjAyMi0yMDI2IjtzOjM6InNlYyI7czoxOiJBIjtzOjg6InNlbWVzdGVyIjtpOjY7fQ==', 1743048148),
+('V9JFqUwBcDTmkUjZolJXhROJeoemsBCcvkvetquW', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoicWpoMEFKZUdlaEVVTG9JY0o1Y3BJOWlWZ3h1Vld1NnBWM0F6WVc4bSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9sb2dpbiI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1743046764);
 
 -- --------------------------------------------------------
 
@@ -4492,7 +4493,8 @@ CREATE TABLE `subjects` (
   `subjectcode` varchar(20) NOT NULL,
   `subjectname` varchar(50) NOT NULL,
   `studentlist` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`studentlist`)),
-  `fname` varchar(50) NOT NULL,
+  `fname1` varchar(255) NOT NULL,
+  `fname2` varchar(255) DEFAULT NULL,
   `semester` int(11) NOT NULL,
   `batch` varchar(10) NOT NULL,
   `dept` varchar(50) NOT NULL,
@@ -4503,9 +4505,10 @@ CREATE TABLE `subjects` (
 -- Dumping data for table `subjects`
 --
 
-INSERT INTO `subjects` (`id`, `cid`, `subjectcode`, `subjectname`, `studentlist`, `fname`, `semester`, `batch`, `dept`, `sec`) VALUES
-(1, 11, '18CSE002J', 'PYTHON PROGRAMMING', NULL, 'Prof. Edsger Dijkstra', 6, '2022-2026', 'Computer Science and Engineering', 'B'),
-(2, 11, '18CSE007J', 'asfxxzc', NULL, 'Prof. Dennis Ritchie', 6, '2022-2026', 'Computer Science and Engineering', 'B');
+INSERT INTO `subjects` (`id`, `cid`, `subjectcode`, `subjectname`, `studentlist`, `fname1`, `fname2`, `semester`, `batch`, `dept`, `sec`) VALUES
+(5, 12, '18CSE022J', 'Surveying I', NULL, 'Prof. Tim Berners-Lee', '', 6, '2022-2026', 'Computer Science and Engineering', 'A'),
+(10, 11, '18CSE082J', 'hariharn', NULL, 'Prof. Ada Lovelace', '', 6, '2022-2026', 'Computer Science and Engineering', 'B'),
+(15, 11, '18CSE007J', 'asfxxzc', NULL, 'Prof. Bjarne Stroustrup', NULL, 6, '2022-2026', 'Computer Science and Engineering', 'B');
 
 --
 -- Indexes for dumped tables
@@ -4571,7 +4574,7 @@ ALTER TABLE `subjects`
 -- AUTO_INCREMENT for table `advisor`
 --
 ALTER TABLE `advisor`
-  MODIFY `cid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `cid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `courses`
@@ -4607,7 +4610,7 @@ ALTER TABLE `student`
 -- AUTO_INCREMENT for table `subjects`
 --
 ALTER TABLE `subjects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
