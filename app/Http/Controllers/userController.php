@@ -448,6 +448,27 @@ class userController extends Controller
             'sec' => $sec
         ]);
 
+        // Map faculty to attendance_map
+        $attendanceData = [
+            [
+                'cid' => $cid,
+                'subjectcode' => $data['subjectcode'],
+                'subjectname' => $data['subjectname'],
+                'faculty' => $faculty1->name
+            ]
+        ];
+
+        if ($faculty2) {
+            $attendanceData[] = [
+                'cid' => $cid,
+                'subjectcode' => $data['subjectcode'],
+                'subjectname' => $data['subjectname'],
+                'faculty' => $faculty2->name
+            ];
+        }
+
+        DB::table('attendance_map')->insert($attendanceData);
+
         return response()->json([
             'status' => 'success',
             'message' => "Faculty {$faculty1->name}" . ($faculty2 ? " and {$faculty2->name}" : "") . " assigned to subject {$data['subjectname']}"
@@ -512,7 +533,7 @@ class userController extends Controller
             $subjects = DB::table('subjects')
                 ->where('dept', $dept)
                 ->where('cid', $cid)
-                ->get(['subjectcode', 'subjectname', 'fname1', 'fname2']);
+                ->get(['subjectcode', 'subjectname', 'fac1id','fname1','fac2id', 'fname2']);
 
             return response()->json([
                 'status' => 'success',
@@ -526,4 +547,116 @@ class userController extends Controller
         }
     }
 
+    public function fetchFaculty(Request $request)
+    {
+        $subjectCode = $request->input('subjectCode');
+
+        try {
+            $faculty = DB::table('subjects')
+                ->where('subjectcode', $subjectCode)
+                ->select('fname1', 'fname2')
+                ->first();
+
+            if ($faculty) {
+                $facultyList = array_filter([$faculty->fname1, $faculty->fname2]);
+                return response()->json([
+                    'status' => 'success',
+                    'data' => $facultyList
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No faculty assigned for this subject.'
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch faculty. Please try again.'
+            ]);
+        }
+    }
+
+    public function mapStudents(Request $request)
+    {
+        $data = $request->validate([
+            'subjectCode' => 'required|string',
+            'students' => 'required|array',
+            'faculty' => 'required|string'
+        ]);
+
+        try {
+            foreach ($data['students'] as $studentId) {
+                DB::table('student_subject_mapping')->updateOrInsert(
+                    [
+                        'subject_code' => $data['subjectCode'],
+                        'student_id' => $studentId
+                    ],
+                    [
+                        'faculty' => $data['faculty']
+                    ]
+                );
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Students successfully mapped to the subject.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to map students. Please try again.'
+            ]);
+        }
+    }
+
+    public function store(Request $request)
+    {
+        $subjectCode = $request->input('subjectCode');
+        $students = $request->input('students');
+
+        // Fetch cid from the advisor table
+        $cid = DB::table('advisor')->where('advisorname', session('name'))->value('cid');
+
+        if (!$cid) {
+            return response()->json(['status' => 'error', 'message' => 'Advisor not found.']);
+        }
+
+        // Fetch subject details from the subjects table
+        $subject = DB::table('subjects')
+            ->where('subjectcode', $subjectCode)
+            ->where('cid', $cid)
+            ->select('subjectcode', 'subjectname', 'fname1', 'fac1id', 'fname2', 'fac2id')
+            ->first();
+
+        if (!$subject) {
+            return response()->json(['status' => 'error', 'message' => 'Subject not found.']);
+        }
+
+        // Validate students array
+        if (empty($students) || !is_array($students)) {
+            return response()->json(['status' => 'error', 'message' => 'Invalid students data.']);
+        }
+
+        // Prepare attendance data
+        $attendanceData = [];
+        foreach ($students as $studentId) {
+            $attendanceData[] = [
+                'cid' => $cid,
+                'sid' => $studentId,
+                'subject_code' => $subject->subjectcode,
+                'subject_name' => $subject->subjectname,
+                'fac_name' => $subject->fname1 . ($subject->fname2 ? ', ' . $subject->fname2 : ''),
+                'fac_id' => $subject->fac1id, // Include fac1id for the faculty
+            ];
+        }
+
+        // Insert data into attendance_map table
+        try {
+            DB::table('attendance_map')->insert($attendanceData);
+            return response()->json(['status' => 'success', 'message' => 'Students assigned successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Failed to assign students. Error: ' . $e->getMessage()]);
+        }
+    }
 }

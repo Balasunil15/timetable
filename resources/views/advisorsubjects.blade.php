@@ -706,6 +706,46 @@
                 });
             }
         });
+
+        $(document).on('click', '#assignStudentsButton', function () {
+            const selectedStudents = [];
+            const subjectCode = $('#studentsModal').data('subjectcode');
+            const subjectName = $('#studentsModalLabel').text().split('(')[0].trim();
+            const assignedFaculty = $('#facultyDropdown').val();
+
+            // Collect selected student IDs
+            document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]:checked').forEach(checkbox => {
+                selectedStudents.push(checkbox.id.replace('student', ''));
+            });
+
+            if (selectedStudents.length === 0 || !assignedFaculty) {
+                Swal.fire('Error', 'Please select students and assign a faculty.', 'error');
+                return;
+            }
+
+            // Send data to the server
+            $.ajax({
+                url: "{{ route('attendance.map') }}", // Define this route in your web.php
+                type: "POST",
+                data: {
+                    subjectCode,
+                    subjectName,
+                    students: selectedStudents,
+                    faculty: assignedFaculty,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        Swal.fire('Success', response.message, 'success').then(() => location.reload());
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Error', 'An error occurred while assigning students.', 'error');
+                }
+            });
+        });
     </script>
 
     @php
@@ -770,189 +810,176 @@
                 <div class="modal-body">
                     <div class="row mb-3">
                         <div class="col-md-2">
-                            <button class="btn btn-outline-primary w-100" onclick="selectAllStudents()">Select
-                                All</button>
+                            <button class="btn btn-outline-primary w-100" onclick="mapStudents('all')">Select All</button>
                         </div>
                         <div class="col-md-2">
-                            <button class="btn btn-outline-primary w-100" onclick="selectOddStudents()">Odd
-                                Students</button>
+                            <button class="btn btn-outline-primary w-100" onclick="mapStudents('odd')">Odd Students</button>
                         </div>
                         <div class="col-md-2">
-                            <button class="btn btn-outline-primary w-100" onclick="selectEvenStudents()">Even
-                                Students</button>
+                            <button class="btn btn-outline-primary w-100" onclick="mapStudents('even')">Even Students</button>
                         </div>
                         <div class="col-md-3">
-                            <button class="btn btn-outline-primary w-100" onclick="selectFirstHalfStudents()">1st Half
-                                Students</button>
+                            <button class="btn btn-outline-primary w-100" onclick="mapStudents('firstHalf')">1st Half Students</button>
                         </div>
                         <div class="col-md-3">
-                            <button class="btn btn-outline-primary w-100" onclick="selectSecondHalfStudents()">2nd Half
-                                Students</button>
+                            <button class="btn btn-outline-primary w-100" onclick="mapStudents('secondHalf')">2nd Half Students</button>
                         </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="facultyDropdown" class="form-label">Assign to Faculty:</label>
+                        <select class="form-select" id="facultyDropdown">
+                            <!-- Dynamic faculty options will be populated here -->
+                        </select>
+                    </div>
+                    <div class="text-end">
+                        <button class="btn btn-success" id="assignStudentsButton">Assign Students</button>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <ul class="list-group">
-                                <li class="list-group-item">
-                                    <input type="checkbox" id="student1" name="student1">
-                                    <label for="student1">Student 1 (ID: 001)</label>
-                                </li>
-                                <li class="list-group-item">
-                                    <input type="checkbox" id="student2" name="student2">
-                                    <label for="student2">Student 2 (ID: 002)</label>
-                                </li>
-                                <li class="list-group-item">
-                                    <input type="checkbox" id="student3" name="student3">
-                                    <label for="student3">Student 3 (ID: 003)</label>
-                                </li>
-                                <!-- Add more students as needed -->
+                            <ul class="list-group" id="leftStudentList">
+                                <!-- Dynamic content -->
                             </ul>
                         </div>
                         <div class="col-md-6">
-                            <ul class="list-group">
-                                <li class="list-group-item">
-                                    <input type="checkbox" id="student4" name="student4">
-                                    <label for="student4">Student 4 (ID: 004)</label>
-                                </li>
-                                <li class="list-group-item">
-                                    <input type="checkbox" id="student5" name="student5">
-                                    <label for="student5">Student 5 (ID: 005)</label>
-                                </li>
-                                <li class="list-group-item">
-                                    <input type="checkbox" id="student6" name="student6">
-                                    <label for="student6">Student 6 (ID: 006)</label>
-                                </li>
-                                <!-- Add more students as needed -->
+                            <ul class="list-group" id="rightStudentList">
+                                <!-- Dynamic content -->
                             </ul>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-primary" onclick="submitStudentMapping()">Submit</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        function selectAllStudents() {
+        function mapStudents(criteria) {
             const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = true;
-            });
-        }
-
-        function selectOddStudents() {
-            const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
+            const total = checkboxes.length;
             checkboxes.forEach((checkbox, index) => {
-                checkbox.checked = (index % 2 === 0);
+                switch (criteria) {
+                    case 'all':
+                        checkbox.checked = true;
+                        break;
+                    case 'odd':
+                        checkbox.checked = index % 2 === 0;
+                        break;
+                    case 'even':
+                        checkbox.checked = index % 2 !== 0;
+                        break;
+                    case 'firstHalf':
+                        checkbox.checked = index < total / 2;
+                        break;
+                    case 'secondHalf':
+                        checkbox.checked = index >= total / 2;
+                        break;
+                }
             });
         }
 
-        function selectEvenStudents() {
-            const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
-            checkboxes.forEach((checkbox, index) => {
-                checkbox.checked = (index % 2 !== 0);
-            });
-        }
+        $(document).on('click', '.btn-primary[data-bs-target="#studentsModal"]', function () {
+            const subjectCode = $(this).closest('tr').find('td:first').text().trim();
+            const subjectName = $(this).closest('tr').find('td:nth-child(2)').text().trim();
 
-        function selectFirstHalfStudents() {
-            const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
-            const half = Math.ceil(checkboxes.length / 2);
-            checkboxes.forEach((checkbox, index) => {
-                checkbox.checked = (index < half);
-            });
-        }
+            // Set subject details in the modal
+            $('#studentsModalLabel').text(`Select Students for ${subjectName} (${subjectCode})`);
+            $('#studentsModal').data('subjectcode', subjectCode);
 
-        function selectSecondHalfStudents() {
-            const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
-            const half = Math.ceil(checkboxes.length / 2);
-            checkboxes.forEach((checkbox, index) => {
-                checkbox.checked = (index >= half);
-            });
-        }
-
-        // When a "Choose Faculty" button is clicked in the table row, set the hidden fields in the modal
-        $(document).on('click', '.btn-primary[data-bs-target="#facultyModal"]', function () {
-            const subjectcode = $(this).closest('tr').find('td:first').text().trim();
-            const subjectname = $(this).closest('tr').find('td:nth-child(2)').text().trim();
-            const subjecttype = $(this).closest('tr').find('td:nth-child(4)').text().trim().toLowerCase();
-
-            $('#subjectcode').val(subjectcode);
-            $('#subjectname').val(subjectname);
-            $('#subjecttype').val(subjecttype);
-
-            // Enable or disable the second faculty dropdown based on subject type
-            if (subjecttype === 'lab') {
-                $('#facultySelect2').prop('disabled', false);
-            } else {
-                $('#facultySelect2').prop('disabled', false); // Allow two faculties for theory
-            }
-        });
-
-        // On facultyModal form submission, validate and send AJAX POST to assign the subject
-        $('#assignSubjectForm').on('submit', function (e) {
-            e.preventDefault();
-
-            const subjecttype = $('#subjecttype').val();
-            const faculty1 = $('#facultySelect1').val();
-            const faculty2 = $('#facultySelect2').val();
-
-            // Validation: Ensure at least one faculty is selected
-            if (!faculty1) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Validation Error',
-                    text: 'At least one faculty must be selected.',
-                    confirmButtonText: 'Ok'
-                });
-                return;
-            }
-
-            // If only one faculty is selected, set the second faculty to null
-            const formData = {
-                subjectcode: $('#subjectcode').val(),
-                subjectname: $('#subjectname').val(),
-                fid1: faculty1,
-                fid2: faculty2 || null // Set to null if not selected
-            };
-
+            // Fetch assigned faculty for the subject
             $.ajax({
-                url: "{{ route('subject.assign') }}",
-                type: "POST",
-                data: formData,
+                url: "{{ route('faculty.fetch') }}",
+                type: "GET",
+                data: { subjectCode },
                 success: function (response) {
                     if (response.status === 'success') {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: response.message,
-                            confirmButtonText: 'Ok'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
+                        const facultyDropdown = $('#facultyDropdown');
+                        facultyDropdown.empty();
+                        response.data.forEach(faculty => {
+                            facultyDropdown.append(`<option value="${faculty}">${faculty}</option>`);
                         });
                     } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: response.message,
-                            confirmButtonText: 'Ok'
-                        });
+                        Swal.fire('Error', response.message, 'error');
                     }
                 },
                 error: function () {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'An error occurred while processing your request.',
-                        confirmButtonText: 'Ok'
-                    });
+                    Swal.fire('Error', 'Failed to fetch faculty. Please try again.', 'error');
+                }
+            });
+
+            // Fetch students dynamically
+            $.ajax({
+                url: "{{ route('students.fetch') }}",
+                type: "GET",
+                data: {
+                    dept: "{{ session('dept') }}",
+                    section: "{{ session('sec') }}",
+                    batch: "{{ session('batch') }}"
+                },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        const studentsList = response.data;
+                        const leftColumn = $('#studentsModal .list-group').first();
+                        const rightColumn = $('#studentsModal .list-group').last();
+
+                        leftColumn.empty();
+                        rightColumn.empty();
+
+                        studentsList.forEach((student, index) => {
+                            const studentItem = `
+                                <li class="list-group-item">
+                                    <input type="checkbox" id="student${student.uid}" name="student${student.uid}">
+                                    <label for="student${student.uid}">${student.sname} (${student.sid})</label>
+                                </li>
+                            `;
+                            if (index % 2 === 0) {
+                                leftColumn.append(studentItem);
+                            } else {
+                                rightColumn.append(studentItem);
+                            }
+                        });
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Error', 'Failed to fetch students. Please try again.', 'error');
                 }
             });
         });
+
+        function submitStudentMapping() {
+            const selectedStudents = [];
+            const subjectCode = $('#studentsModal').data('subjectcode');
+            const assignedFaculty = $('#facultyDropdown').val();
+
+            document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]:checked').forEach(checkbox => {
+                selectedStudents.push(checkbox.id.replace('student', ''));
+            });
+
+            $.ajax({
+                url: "{{ route('students.map') }}",
+                type: "POST",
+                data: {
+                    subjectCode,
+                    students: selectedStudents,
+                    faculty: assignedFaculty,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        Swal.fire('Success', response.message, 'success').then(() => location.reload());
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Error', 'An error occurred while mapping students.', 'error');
+                }
+            });
+        }
     </script>
 
 </body>
