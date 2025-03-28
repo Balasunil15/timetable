@@ -73,3 +73,6 @@ Route::get('/students/fetch', [userController::class, 'fetchStudents'])->name('s
 Route::get('/timetable', function () {
     return view('facultysubject');
 })->name('timetable');
+
+
+Route::get('/subjectsfetch', [userController::class, 'fetchsubjects'])->name('subjects.fetch');
