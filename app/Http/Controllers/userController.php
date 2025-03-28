@@ -503,6 +503,7 @@ class userController extends Controller
         }
     }
 
+
     public function fetchSubjects(Request $request)
     {
         $dept = session('dept');

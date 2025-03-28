@@ -305,87 +305,108 @@
 
         <!-- Content Area -->
         <div class="container-fluid">
-            <div class="custom-tabs">
-                <form id="excelfile">
-                    <input type="file" name="import_file" accept=".csv" required>
-                    <button type="submit" name="import" class="btn btn-success">Import</button>
-                </form>
-                <div class="d-flex justify-content-end mb-3">
-
-                    <button class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#addCourseModal">Add
-                        Course</button>
-
+            <!-- Side by Side Cards -->
+            <div class="row mb-4">
+                <!-- Import File Card -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Import Courses</h5>
+                        </div>
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <form id="excelfile" class="h-100 d-flex flex-column">
+                                <div class="flex-grow-1">
+                                    <div class="mb-3">
+                                        <label for="importFile" class="form-label">Choose CSV File</label>
+                                        <input type="file" class="form-control" id="importFile" name="import_file"
+                                            accept=".csv" required>
+                                    </div>
+                                    <p class="text-muted small">
+                                        Supported format: CSV<br>
+                                        Required columns: subcode, type, subname, credits<br>
+                                        Maximum file size: 2MB
+                                    </p>
+                                </div>
+                                <button type="submit" name="import" class="btn btn-success w-100 mt-auto">Import
+                                    Courses</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <!-- DataTable -->
-                <table id="coursesTable" class="table table-striped table-bordered">
-                    <thead class="gradient-header">
-                        <tr>
-                            <th class="text-center">Course Code</th>
-                            <th class="text-center">Course Name</th>
-                            <th class="text-center">Credits</th>
-                            <th class="text-center">Type</th>
-                            <th class="text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($courses as $course)
-                        <tr>
-                            <td class="text-center">{{ $course->courseCode }}</td>
-                            <td class="text-center">{{ $course->courseName }}</td>
-                            <td class="text-center">{{ $course->credits }}</td>
-                            <td class="text-center">{{ $course->type }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning edit-btn"
-                                    data-course-code="{{ $course->courseCode }}"
-                                    data-course-name="{{ $course->courseName }}" data-credits="{{ $course->credits }}"
-                                    data-type="{{ $course->type }}">Edit</button>
-                                <button class="btn btn-sm btn-danger delete-btn"
-                                    data-course-code="{{ $course->courseCode }}">Delete</button>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                <!-- Modal Form for Adding Course -->
 
+                <!-- Add Course Card -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Add New Course</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="addCourseForm">
+                                <div class="mb-3">
+                                    <label for="courseCode" class="form-label">Course Code</label>
+                                    <input type="text" class="form-control" id="courseCode" name="courseCode" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="courseName" class="form-label">Course Name</label>
+                                    <input type="text" class="form-control" id="courseName" name="courseName" required>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="courseCredits" class="form-label">Credits</label>
+                                        <input type="number" class="form-control" id="courseCredits"
+                                            name="courseCredits" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="courseType" class="form-label">Type</label>
+                                        <select class="form-select" id="courseType" name="courseType" required>
+                                            <option value="Theory">Theory</option>
+                                            <option value="Lab">Lab</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Add Course</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="modal fade" id="addCourseModal" tabindex="-1" aria-labelledby="addCourseModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <form id="addCourseForm">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="addCourseModalLabel">Add Course</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label for="courseCode" class="form-label">Course Code</label>
-                                <input type="text" class="form-control" id="courseCode" name="courseCode" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="courseName" class="form-label">Course Name</label>
-                                <input type="text" class="form-control" id="courseName" name="courseName" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="courseCredits" class="form-label">Credits</label>
-                                <input type="number" class="form-control" id="courseCredits" name="courseCredits"
-                                    required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="courseType" class="form-label">Type</label>
-                                <select class="form-select" id="courseType" name="courseType" required>
-                                    <option value="Theory">Theory</option>
-                                    <option value="Lab">Lab</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save Course</button>
-                        </div>
-                    </form>
+
+            <!-- Courses Table -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Course List</h5>
+                </div>
+                <div class="card-body">
+                    <table id="coursesTable" class="table table-striped table-bordered">
+                        <thead class="gradient-header">
+                            <tr>
+                                <th class="text-center">Course Code</th>
+                                <th class="text-center">Course Name</th>
+                                <th class="text-center">Credits</th>
+                                <th class="text-center">Type</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($courses as $course)
+                                <tr>
+                                    <td class="text-center">{{ $course->courseCode }}</td>
+                                    <td class="text-center">{{ $course->courseName }}</td>
+                                    <td class="text-center">{{ $course->credits }}</td>
+                                    <td class="text-center">{{ $course->type }}</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-warning edit-btn"
+                                            data-course-code="{{ $course->courseCode }}"
+                                            data-course-name="{{ $course->courseName }}"
+                                            data-credits="{{ $course->credits }}"
+                                            data-type="{{ $course->type }}">Edit</button>
+                                        <button class="btn btn-sm btn-danger delete-btn"
+                                            data-course-code="{{ $course->courseCode }}">Delete</button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -446,7 +467,7 @@
         }
 
         //    automatic loader
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const loaderContainer = document.getElementById('loaderContainer');
             let loadingTimeout;
 
@@ -463,7 +484,7 @@
             loadingTimeout = setTimeout(showError, 10000);
 
             // Hide loader when everything is loaded
-            window.onload = function() {
+            window.onload = function () {
                 clearTimeout(loadingTimeout);
 
                 // Add a small delay to ensure smooth transition
@@ -471,14 +492,14 @@
             };
 
             // Error handling
-            window.onerror = function(msg, url, lineNo, columnNo, error) {
+            window.onerror = function (msg, url, lineNo, columnNo, error) {
                 clearTimeout(loadingTimeout);
                 showError();
                 return false;
             };
         });
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             // Cache DOM elements
             const elements = {
                 hamburger: document.getElementById('hamburger'),
@@ -614,21 +635,21 @@
         });
 
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Initialize DataTable using existing courses displayed via Blade loop
             $('#coursesTable').DataTable({
                 // DataTable initialization options can be added here if needed
             });
             $('#excelfile')[0].reset();
         });
-        $('#addCourseForm').on('submit', function(e) {
+        $('#addCourseForm').on('submit', function (e) {
             e.preventDefault();
             var formData = $(this).serialize();
             $.ajax({
                 url: "{{ route('subjects.store') }}",
                 type: "POST",
                 data: formData,
-                success: function(response) {
+                success: function (response) {
                     if (response.status === 'error') {
                         Swal.fire({
                             icon: 'warning',
@@ -651,7 +672,7 @@
                         });
                     }
                 },
-                error: function() {
+                error: function () {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -661,17 +682,17 @@
                 }
             });
         });
-        $('#excelfile').on('submit', function(e) {
+        $('#excelfile').on('submit', function (e) {
             e.preventDefault();
 
             var formData = new FormData(this); // Use FormData for file uploads
             $.ajax({
-                 url: "{{ route('courses.import') }}",
+                url: "{{ route('courses.import') }}",
                 type: "POST",
                 data: formData,
                 processData: false,
                 contentType: false,
-                success: function(response) {
+                success: function (response) {
                     if (response.status === 'error') {
                         Swal.fire({
                             icon: 'warning',
@@ -695,7 +716,7 @@
                         });
                     }
                 },
-                error: function() {
+                error: function () {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -708,7 +729,7 @@
 
 
         // Handle Edit button click
-        $('.edit-btn').on('click', function() {
+        $('.edit-btn').on('click', function () {
             const btn = $(this);
             $('#editCourseCode').val(btn.data('course-code'));
             $('#editCourseName').val(btn.data('course-name'));
@@ -718,14 +739,14 @@
         });
 
         // Handle Edit Course Form submission
-        $('#editCourseForm').on('submit', function(e) {
+        $('#editCourseForm').on('submit', function (e) {
             e.preventDefault();
             var formData = $(this).serialize();
             $.ajax({
                 url: "{{ route('subjects.update') }}",
                 type: "POST",
                 data: formData,
-                success: function(response) {
+                success: function (response) {
                     if (response.status === 'error') {
                         Swal.fire({
                             icon: 'warning',
@@ -751,7 +772,7 @@
                         });
                     }
                 },
-                error: function() {
+                error: function () {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -763,7 +784,7 @@
         });
 
         // Handle Delete button click
-        $('.delete-btn').on('click', function() {
+        $('.delete-btn').on('click', function () {
             var courseCode = $(this).data('course-code');
             Swal.fire({
                 title: "Are you sure?",
@@ -779,7 +800,7 @@
                         data: {
                             courseCode: courseCode
                         },
-                        success: function(response) {
+                        success: function (response) {
                             if (response.status === 'success') {
                                 Swal.fire({
                                     icon: 'success',
@@ -797,7 +818,7 @@
                                 });
                             }
                         },
-                        error: function() {
+                        error: function () {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
