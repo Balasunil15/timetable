@@ -5,7 +5,6 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\userController;
 use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\StudentController;
-use App\Http\Controllers\AttendanceController;
 
 // Authentication Routes
 Route::get('/login', function () {
@@ -70,18 +69,10 @@ Route::post('/subject/remove', [userController::class, 'removeSubject'])->name('
 // Updated route to use userController for fetching students
 Route::get('/students/fetch', [userController::class, 'fetchStudents'])->name('students.fetch');
 
-// Route to fetch assigned faculty for a subject
-Route::get('/faculty/fetch', [userController::class, 'fetchFaculty'])->name('faculty.fetch');
-
-// Route to map students to a subject
-Route::post('/students/map', [userController::class, 'mapStudents'])->name('students.map');
-
 // Timetable Route
 Route::get('/timetable', function () {
     return view('facultysubject');
 })->name('timetable');
 
-Route::get('/subjectsfetch', [userController::class, 'fetchsubjects'])->name('subjects.fetch');
 
-// Attendance Mapping Route
-Route::post('/attendance/map', [userController::class, 'store'])->name('attendance.map');
+Route::get('/subjectsfetch', [userController::class, 'fetchsubjects'])->name('subjects.fetch');

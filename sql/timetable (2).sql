@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 28, 2025 at 08:24 AM
+-- Generation Time: Mar 27, 2025 at 05:07 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -47,23 +47,6 @@ INSERT INTO `advisor` (`cid`, `dept`, `batch`, `sec`, `semester`, `advisorname`)
 -- --------------------------------------------------------
 
 --
--- Table structure for table `attendance_map`
---
-
-CREATE TABLE `attendance_map` (
-  `id` int(11) NOT NULL,
-  `cid` int(255) NOT NULL,
-  `sid` varchar(255) NOT NULL,
-  `subject_code` varchar(255) NOT NULL,
-  `subject_name` text NOT NULL,
-  `fac_id` int(255) NOT NULL,
-  `fac_name` varchar(255) NOT NULL,
-  `attendance` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`attendance`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `courses`
 --
 
@@ -87,8 +70,7 @@ INSERT INTO `courses` (`id`, `subcode`, `subname`, `credits`, `type`, `dept`, `c
 (3, '18CSE002J', 'PYTHON PROGRAMMING', 4, 'Lab', 'Computer Science and Engineering', 'Dr. John Smith'),
 (4, '18CSE007J', 'asfxxzc', 7, 'Theory', 'Computer Science and Engineering', 'Dr. John Smith'),
 (5, '18CSE022J', 'Surveying I', 4, 'Lab', 'Computer Science and Engineering', 'Dr. John Smith'),
-(6, '18CSE082J', 'hariharn', 4, 'Theory', 'Computer Science and Engineering', 'Dr. John Smith'),
-(7, '18cse022', 'db', 4, 'Theory', 'Computer Science and Engineering', 'Dr. John Smith');
+(6, '18CSE082J', 'hariharn', 4, 'Theory', 'Computer Science and Engineering', 'Dr. John Smith');
 
 -- --------------------------------------------------------
 
@@ -269,7 +251,9 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('mh2drEPegyOCTLY805U0wSRlTOdyYeE2WOPHNomC', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0', 'YToxMjp7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzg6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9mYWN1bHR5ZGFzaGJvYXJkIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo2OiJfdG9rZW4iO3M6NDA6IlJJdEgxelNQc2RmVWVUUjE2WjNNWk5JcDdGeENlem5OVTVUaXhramEiO3M6MzoiZmlkIjtpOjIwMDAwMDI7czo0OiJuYW1lIjtzOjE4OiJQcm9mLiBHcmFjZSBIb3BwZXIiO3M6NDoiZGVwdCI7czozMjoiQ29tcHV0ZXIgU2NpZW5jZSBhbmQgRW5naW5lZXJpbmciO3M6NDoicm9sZSI7czo3OiJmYWN1bHR5IjtzOjc6ImFkdmlzb3IiO2k6MTtzOjM6ImNpZCI7aToxMTtzOjU6ImJhdGNoIjtzOjk6IjIwMjItMjAyNiI7czozOiJzZWMiO3M6MToiQiI7czo4OiJzZW1lc3RlciI7aTo2O30=', 1743144572);
+('fKKCrjovsDSnI1ctiRykjEUxcxOVQ4PhdAO0NecD', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0', 'YToxMjp7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZHZpc29yc3ViamVjdHMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjY6Il90b2tlbiI7czo0MDoiTmd5RDlhdDJncVJLQjQ1T0F4QUtad0xQdGhic3FaN2F4WEtlMFpHVyI7czozOiJmaWQiO2k6MjAwMDAwMjtzOjQ6Im5hbWUiO3M6MTg6IlByb2YuIEdyYWNlIEhvcHBlciI7czo0OiJkZXB0IjtzOjMyOiJDb21wdXRlciBTY2llbmNlIGFuZCBFbmdpbmVlcmluZyI7czo0OiJyb2xlIjtzOjc6ImZhY3VsdHkiO3M6NzoiYWR2aXNvciI7aToxO3M6MzoiY2lkIjtpOjExO3M6NToiYmF0Y2giO3M6OToiMjAyMi0yMDI2IjtzOjM6InNlYyI7czoxOiJCIjtzOjg6InNlbWVzdGVyIjtpOjY7fQ==', 1742988907),
+('KJC0bB4yHonr36gjYRyklyzIw2EsA2wZLcjgi3aw', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0', 'YToxMjp7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZHZpc29yc3ViamVjdHMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjY6Il90b2tlbiI7czo0MDoiRWhTU0ZlRm1ka0pRYkJsb2ptNU9CaVJmdFExdU40cGFYQkVFM09uTiI7czozOiJmaWQiO2k6MjAwMDAwMztzOjQ6Im5hbWUiO3M6MTg6IlByb2YuIERvbmFsZCBLbnV0aCI7czo0OiJkZXB0IjtzOjMyOiJDb21wdXRlciBTY2llbmNlIGFuZCBFbmdpbmVlcmluZyI7czo0OiJyb2xlIjtzOjc6ImZhY3VsdHkiO3M6NzoiYWR2aXNvciI7aToxO3M6MzoiY2lkIjtpOjEyO3M6NToiYmF0Y2giO3M6OToiMjAyMi0yMDI2IjtzOjM6InNlYyI7czoxOiJBIjtzOjg6InNlbWVzdGVyIjtpOjY7fQ==', 1743048148),
+('V9JFqUwBcDTmkUjZolJXhROJeoemsBCcvkvetquW', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoicWpoMEFKZUdlaEVVTG9JY0o1Y3BJOWlWZ3h1Vld1NnBWM0F6WVc4bSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9sb2dpbiI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1743046764);
 
 -- --------------------------------------------------------
 
@@ -4508,9 +4492,8 @@ CREATE TABLE `subjects` (
   `cid` int(11) NOT NULL,
   `subjectcode` varchar(20) NOT NULL,
   `subjectname` varchar(50) NOT NULL,
-  `fac1id` int(255) NOT NULL,
+  `studentlist` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`studentlist`)),
   `fname1` varchar(255) NOT NULL,
-  `fac2id` int(255) NOT NULL,
   `fname2` varchar(255) DEFAULT NULL,
   `semester` int(11) NOT NULL,
   `batch` varchar(10) NOT NULL,
@@ -4522,25 +4505,10 @@ CREATE TABLE `subjects` (
 -- Dumping data for table `subjects`
 --
 
-INSERT INTO `subjects` (`id`, `cid`, `subjectcode`, `subjectname`, `fac1id`, `fname1`, `fac2id`, `fname2`, `semester`, `batch`, `dept`, `sec`) VALUES
-(10, 11, '18CSE082J', 'hariharn', 0, 'Prof. Ada Lovelace', 0, '', 6, '2022-2026', 'Computer Science and Engineering', 'B'),
-(15, 11, '18CSE007J', 'asfxxzc', 0, 'Prof. Bjarne Stroustrup', 0, NULL, 6, '2022-2026', 'Computer Science and Engineering', 'B'),
-(29, 12, '18CSE082J', 'hariharn', 0, 'Dr. John Smith', 0, 'Prof. Grace Hopper', 6, '2022-2026', 'Computer Science and Engineering', 'A'),
-(30, 11, '18CSE022J', 'Surveying I', 0, 'Prof. Alan Turing', 0, 'Prof. Linus Torvalds', 6, '2022-2026', 'Computer Science and Engineering', 'B');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `timetable_map`
---
-
-CREATE TABLE `timetable_map` (
-  `id` int(11) NOT NULL,
-  `cid` int(255) NOT NULL,
-  `day` varchar(255) NOT NULL,
-  `hour` int(255) NOT NULL,
-  `subject_code` int(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+INSERT INTO `subjects` (`id`, `cid`, `subjectcode`, `subjectname`, `studentlist`, `fname1`, `fname2`, `semester`, `batch`, `dept`, `sec`) VALUES
+(5, 12, '18CSE022J', 'Surveying I', NULL, 'Prof. Tim Berners-Lee', '', 6, '2022-2026', 'Computer Science and Engineering', 'A'),
+(10, 11, '18CSE082J', 'hariharn', NULL, 'Prof. Ada Lovelace', '', 6, '2022-2026', 'Computer Science and Engineering', 'B'),
+(15, 11, '18CSE007J', 'asfxxzc', NULL, 'Prof. Bjarne Stroustrup', NULL, 6, '2022-2026', 'Computer Science and Engineering', 'B');
 
 --
 -- Indexes for dumped tables
@@ -4551,12 +4519,6 @@ CREATE TABLE `timetable_map` (
 --
 ALTER TABLE `advisor`
   ADD PRIMARY KEY (`cid`);
-
---
--- Indexes for table `attendance_map`
---
-ALTER TABLE `attendance_map`
-  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `courses`
@@ -4605,12 +4567,6 @@ ALTER TABLE `subjects`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `timetable_map`
---
-ALTER TABLE `timetable_map`
-  ADD PRIMARY KEY (`id`);
-
---
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -4621,16 +4577,10 @@ ALTER TABLE `advisor`
   MODIFY `cid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
--- AUTO_INCREMENT for table `attendance_map`
---
-ALTER TABLE `attendance_map`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `faculty`
@@ -4660,13 +4610,7 @@ ALTER TABLE `student`
 -- AUTO_INCREMENT for table `subjects`
 --
 ALTER TABLE `subjects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
-
---
--- AUTO_INCREMENT for table `timetable_map`
---
-ALTER TABLE `timetable_map`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
