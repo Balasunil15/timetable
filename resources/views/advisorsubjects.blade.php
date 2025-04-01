@@ -712,12 +712,7 @@
         $dept = session('dept');
         $facultyNotAssigned = DB::table('faculty')
             ->where('dept', $dept)
-            ->whereNotIn('name', function ($query) use ($dept) {
-                $query->select('fname1')
-                    ->where('dept', $dept)
-                    ->where('semester', session('semester'))
-                    ->from('subjects');
-            })
+            
             ->get(); 
     @endphp
     <!-- Faculty Modal -->
