@@ -279,35 +279,6 @@
         .breadcrumb-item a:hover {
             color: #224abe;
         }
-
-        .selected-subjects {
-            background-color: #e3f2fd;
-            border-radius: 4px;
-            font-size: 0.85em;
-        }
-        
-        .selected-subjects div {
-            word-break: break-word;
-        }
-
-        .selected-subjects {
-            background-color: #e3f2fd;
-            border-radius: 4px;
-            padding: 8px;
-        }
-        
-        .selected-subject {
-            font-size: 0.85em;
-            color: #333;
-            margin-bottom: 4px;
-        }
-        
-        .edit-subjects {
-            font-size: 0.8em;
-            color: #4e73df;
-            cursor: pointer;
-            margin-top: 4px;
-        }
     </style>
 </head>
 
@@ -351,56 +322,56 @@
                 <tbody>
                     <tr>
                         <td class="text-center">Monday</td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Monday', '1st Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Monday', '2nd Hr', this.closest('td'))">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Monday', '1st Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Monday', '2nd Hr')">Choose Subject</button></td>
                         <td rowspan="6" class="align-middle bg-light">Break</td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Monday', '3rd Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Monday', '4th Hr', this.closest('td'))">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Monday', '3rd Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Monday', '4th Hr')">Choose Subject</button></td>
                         <td rowspan="6" class="align-middle bg-light">Lunch</td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Monday', '5th Hr', this.closest('td'))">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Monday', '5th Hr')">Choose Subject</button></td>
                         <td rowspan="6" class="align-middle bg-light">Break</td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Monday', '6th Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Monday', '7th Hr', this.closest('td'))">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Monday', '6th Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Monday', '7th Hr')">Choose Subject</button></td>
                     </tr>
                     <tr>
                         <td class="text-center">Tuesday</td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Tuesday', '1st Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Tuesday', '2nd Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Tuesday', '3rd Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Tuesday', '4th Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Tuesday', '5th Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Tuesday', '6th Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Tuesday', '7th Hr', this.closest('td'))">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Tuesday', '1st Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Tuesday', '2nd Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Tuesday', '3rd Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Tuesday', '4th Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Tuesday', '5th Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Tuesday', '6th Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Tuesday', '7th Hr')">Choose Subject</button></td>
                     </tr>
                     <tr>
                         <td class="text-center">Wednesday</td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Wednesday', '1st Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Wednesday', '2nd Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Wednesday', '3rd Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Wednesday', '4th Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Wednesday', '5th Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Wednesday', '6th Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Wednesday', '7th Hr', this.closest('td'))">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Wednesday', '1st Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Wednesday', '2nd Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Wednesday', '3rd Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Wednesday', '4th Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Wednesday', '5th Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Wednesday', '6th Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Wednesday', '7th Hr')">Choose Subject</button></td>
                     </tr>
                     <tr>
                         <td class="text-center">Thursday</td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Thursday', '1st Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Thursday', '2nd Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Thursday', '3rd Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Thursday', '4th Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Thursday', '5th Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Thursday', '6th Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Thursday', '7th Hr', this.closest('td'))">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Thursday', '1st Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Thursday', '2nd Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Thursday', '3rd Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Thursday', '4th Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Thursday', '5th Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Thursday', '6th Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Thursday', '7th Hr')">Choose Subject</button></td>
                     </tr>
                     <tr>
                         <td class="text-center">Friday</td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Friday', '1st Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Friday', '2nd Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Friday', '3rd Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Friday', '4th Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Friday', '5th Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Friday', '6th Hr', this.closest('td'))">Choose Subject</button></td>
-                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Friday', '7th Hr', this.closest('td'))">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Friday', '1st Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Friday', '2nd Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Friday', '3rd Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Friday', '4th Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Friday', '5th Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Friday', '6th Hr')">Choose Subject</button></td>
+                        <td><button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#subjectModal" onclick="openSubjectModal('Friday', '7th Hr')">Choose Subject</button></td>
                     </tr>
                 </tbody>
             </table>
@@ -420,14 +391,22 @@
                             <div class="col-md-6">
                                 <label for="subjectSelect" class="form-label">Select Subject 1:</label>
                                 <select class="form-select" id="subjectSelect">
-                                    <option value="" selected disabled>Select Subject</option>
+                                    <option value="Math">Mathematics</option>
+                                    <option value="Physics">Physics</option>
+                                    <option value="Chemistry">Chemistry</option>
+                                    <option value="Biology">Biology</option>
+                                    <option value="English">English</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
                                 <label for="facultySelect" class="form-label">Select subject 2:</label>
                                 <select class="form-select" id="facultySelect">
-                                    <option value="" selected disabled>Select Subject</option>
-                                </select>
+                                <option value="Math">Mathematics</option>
+                                    <option value="Physics">Physics</option>
+                                    <option value="Chemistry">Chemistry</option>
+                                    <option value="Biology">Biology</option>
+                                    <option value="English">English</option>
+                                    </select>
                             </div>
                         </div>
                     </div>
@@ -483,152 +462,27 @@
 
         let selectedDay = '';
         let selectedHour = '';
-        let currentCell = null; // Add this line to track current cell
 
-        function openSubjectModal(day, hour, cell) {
+        function openSubjectModal(day, hour) {
             selectedDay = day;
             selectedHour = hour;
-            currentCell = cell; // Store the clicked cell
             document.getElementById('modalInfo').textContent = `Day: ${day}, Hour: ${hour}`;
-            
-            // If editing existing subjects, populate the modal
-            if (cell && cell.querySelector('.selected-subjects')) {
-                const subjects = cell.querySelectorAll('.selected-subject');
-                const subjectSelect = document.getElementById('subjectSelect');
-                const facultySelect = document.getElementById('facultySelect');
-                
-                // Wait for subjects to load then set values
-                fetch('/subjectsfetch')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            // Populate dropdowns as before
-                            subjectSelect.innerHTML = '<option value="" selected disabled>Select Subject</option>';
-                            facultySelect.innerHTML = '<option value="" selected disabled>Select Subject</option>';
-                            
-                            data.data.forEach(subject => {
-                                const option = `<option value="${subject.subjectcode}">${subject.subjectname} (${subject.fname1}${subject.fname2 ? ', ' + subject.fname2 : ''})</option>`;
-                                subjectSelect.insertAdjacentHTML('beforeend', option);
-                                facultySelect.insertAdjacentHTML('beforeend', option);
-                            });
-
-                            // Set selected values if editing
-                            if (subjects[0]) {
-                                // Find and select first subject
-                                Array.from(subjectSelect.options).forEach(option => {
-                                    if (option.text === subjects[0].textContent) {
-                                        option.selected = true;
-                                    }
-                                });
-                            }
-                            if (subjects[1]) {
-                                // Find and select second subject if it exists
-                                Array.from(facultySelect.options).forEach(option => {
-                                    if (option.text === subjects[1].textContent) {
-                                        option.selected = true;
-                                    }
-                                });
-                            }
-                        }
-                    });
-            } else {
-                // New selection, just fetch subjects
-                fetch('/subjectsfetch')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            const subjectSelect = document.getElementById('subjectSelect');
-                            const facultySelect = document.getElementById('facultySelect');
-                            
-                            // Clear existing options
-                            subjectSelect.innerHTML = '<option value="" selected disabled>Select Subject</option>';
-                            facultySelect.innerHTML = '<option value="" selected disabled>Select Subject</option>';
-                            
-                            // Add new options
-                            data.data.forEach(subject => {
-                                const option = `<option value="${subject.subjectcode}">${subject.subjectname} (${subject.fname1}${subject.fname2 ? ', ' + subject.fname2 : ''})</option>`;
-                                subjectSelect.insertAdjacentHTML('beforeend', option);
-                                facultySelect.insertAdjacentHTML('beforeend', option);
-                            });
-                        } else {
-                            throw new Error(data.message || 'Failed to fetch subjects');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Failed to load subjects. Please try again.');
-                    });
-            }
         }
 
         function saveSubject() {
-            const selectedSubject1 = document.getElementById('subjectSelect');
-            const selectedSubject2 = document.getElementById('facultySelect');
+            const selectedSubject = document.getElementById('subjectSelect').value;
+            const selectedFaculty = document.getElementById('facultySelect').value;
 
-            if (!selectedSubject1.value) {
-                alert('Please select at least one subject.');
+            if (!selectedSubject || !selectedFaculty) {
+                alert('Please select both a subject and a faculty.');
                 return;
             }
 
-            // Get the selected subjects' text
-            const subject1Text = selectedSubject1.options[selectedSubject1.selectedIndex].text;
-            const subject2Text = selectedSubject2.value ? selectedSubject2.options[selectedSubject2.selectedIndex].text : '';
-
-            // Find the corresponding cell in the timetable
-            const rows = document.querySelectorAll('#timetable tbody tr');
-            let targetCell = currentCell || null;
-            
-            if (!targetCell) {
-                rows.forEach(row => {
-                    if (row.cells[0].textContent.trim() === selectedDay) {
-                        const hourIndex = getHourIndex(selectedHour);
-                        targetCell = row.cells[hourIndex];
-                    }
-                });
-            }
-
-            if (targetCell) {
-                // Replace button with selected subjects
-                let html = `
-                    <div class="selected-subjects">
-                        <div class="selected-subject">${subject1Text}</div>`;
-                
-                if (subject2Text) {
-                    html += `<div class="selected-subject">${subject2Text}</div>`;
-                }
-                
-                html += `
-                        <div class="edit-subjects" onclick="openSubjectModal('${selectedDay}', '${selectedHour}', this.closest('td'))">
-                            <i class="fas fa-edit"></i> Edit
-                        </div>
-                    </div>`;
-                    
-                targetCell.innerHTML = html;
-            }
-
+            alert(`Saved ${selectedSubject} with ${selectedFaculty} for ${selectedDay}, Hour ${selectedHour}`);
             // Close the modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('subjectModal'));
             modal.hide();
         }
-
-        function getHourIndex(hour) {
-            const hourMap = {
-                '1st Hr': 1,
-                '2nd Hr': 2,
-                '3rd Hr': 4,
-                '4th Hr': 5,
-                '5th Hr': 7,
-                '6th Hr': 9,
-                '7th Hr': 10
-            };
-            return hourMap[hour];
-        }
-
-        // Add jQuery selector extension for case-insensitive contains
-        jQuery.expr[':'].contains = function(a, i, m) {
-            return jQuery(a).text().toUpperCase()
-                .indexOf(m[3].toUpperCase()) >= 0;
-        };
     </script>
 </body>
 

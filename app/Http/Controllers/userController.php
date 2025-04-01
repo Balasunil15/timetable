@@ -79,9 +79,7 @@ class userController extends Controller
             ->where('dept', $dept)
             ->get();
 
-        return response()->view('subjects', compact('courses'))->header('Cache-Control', 'no-cache, no-store, must-revalidate')
-        ->header('Pragma', 'no-cache')
-        ->header('Expires', '0');
+        return view('subjects', compact('courses'));
     }
 
     public function storeCourse(Request $request)
@@ -259,9 +257,7 @@ class userController extends Controller
             ->where('role', 'faculty')
             ->where('advisor', '!=', 1)
             ->get();
-        return response()->view('advisors', compact('sections', 'advisorRecords', 'facultyList'))->header('Cache-Control', 'no-cache, no-store, must-revalidate')
-        ->header('Pragma', 'no-cache')
-        ->header('Expires', '0');
+        return view('advisors', compact('sections', 'advisorRecords', 'facultyList'));
     }
 
     public function storeAdvisor(Request $request)
@@ -399,9 +395,7 @@ class userController extends Controller
             ->where('semester', $semester)
             ->get();
 
-        return response()->view('students', compact('students'))->header('Cache-Control', 'no-cache, no-store, must-revalidate')
-        ->header('Pragma', 'no-cache')
-        ->header('Expires', '0');
+        return view('students', compact('students'));
     }
 
     public function advisorsubjects(Request $request)
@@ -414,9 +408,7 @@ class userController extends Controller
             ->select('subcode', 'subname', 'credits', 'type')
             ->where('dept', $dept)
             ->get();
-        return response()->view('advisorsubjects', compact('courses'))->header('Cache-Control', 'no-cache, no-store, must-revalidate')
-        ->header('Pragma', 'no-cache')
-        ->header('Expires', '0');
+        return view('advisorsubjects', compact('courses'));
     }
 
     public function assignSubject(Request $request)
@@ -555,4 +547,116 @@ class userController extends Controller
         }
     }
 
+    public function fetchFaculty(Request $request)
+    {
+        $subjectCode = $request->input('subjectCode');
+
+        try {
+            $faculty = DB::table('subjects')
+                ->where('subjectcode', $subjectCode)
+                ->select('fname1', 'fname2')
+                ->first();
+
+            if ($faculty) {
+                $facultyList = array_filter([$faculty->fname1, $faculty->fname2]);
+                return response()->json([
+                    'status' => 'success',
+                    'data' => $facultyList
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No faculty assigned for this subject.'
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch faculty. Please try again.'
+            ]);
+        }
+    }
+
+    public function mapStudents(Request $request)
+    {
+        $data = $request->validate([
+            'subjectCode' => 'required|string',
+            'students' => 'required|array',
+            'faculty' => 'required|string'
+        ]);
+
+        try {
+            foreach ($data['students'] as $studentId) {
+                DB::table('student_subject_mapping')->updateOrInsert(
+                    [
+                        'subject_code' => $data['subjectCode'],
+                        'student_id' => $studentId
+                    ],
+                    [
+                        'faculty' => $data['faculty']
+                    ]
+                );
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Students successfully mapped to the subject.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to map students. Please try again.'
+            ]);
+        }
+    }
+
+    public function store(Request $request)
+    {
+        $subjectCode = $request->input('subjectCode');
+        $students = $request->input('students');
+
+        // Fetch cid from the advisor table
+        $cid = DB::table('advisor')->where('advisorname', session('name'))->value('cid');
+
+        if (!$cid) {
+            return response()->json(['status' => 'error', 'message' => 'Advisor not found.']);
+        }
+
+        // Fetch subject details from the subjects table
+        $subject = DB::table('subjects')
+            ->where('subjectcode', $subjectCode)
+            ->where('cid', $cid)
+            ->select('subjectcode', 'subjectname', 'fname1', 'fac1id', 'fname2', 'fac2id')
+            ->first();
+
+        if (!$subject) {
+            return response()->json(['status' => 'error', 'message' => 'Subject not found.']);
+        }
+
+        // Validate students array
+        if (empty($students) || !is_array($students)) {
+            return response()->json(['status' => 'error', 'message' => 'Invalid students data.']);
+        }
+
+        // Prepare attendance data
+        $attendanceData = [];
+        foreach ($students as $studentId) {
+            $attendanceData[] = [
+                'cid' => $cid,
+                'sid' => $studentId,
+                'subject_code' => $subject->subjectcode,
+                'subject_name' => $subject->subjectname,
+                'fac_name' => $subject->fname1 . ($subject->fname2 ? ', ' . $subject->fname2 : ''),
+                'fac_id' => $subject->fac1id, // Include fac1id for the faculty
+            ];
+        }
+
+        // Insert data into attendance_map table
+        try {
+            DB::table('attendance_map')->insert($attendanceData);
+            return response()->json(['status' => 'success', 'message' => 'Students assigned successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Failed to assign students. Error: ' . $e->getMessage()]);
+        }
+    }
 }
