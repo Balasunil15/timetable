@@ -440,6 +440,8 @@ class userController extends Controller
             'cid' => $cid,
             'subjectcode' => $data['subjectcode'],
             'subjectname' => $data['subjectname'],
+            'fac1id'=>$faculty1->fid,
+            'fac2id'=>$faculty2 ?$faculty2->fid:null,
             'fname1' => $faculty1->name,
             'fname2' => $faculty2 ? $faculty2->name : null,
             'semester' => $semester,
