@@ -4,8 +4,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\userController;
-use App\Http\Controllers\FacultyController;
-use App\Http\Controllers\StudentController;
 
 // Authentication Routes
 Route::get('/login', function () {
