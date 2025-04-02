@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\userController;
 use App\Http\Controllers\FacultyController;
@@ -87,12 +88,49 @@ Route::get('/subjectsfetch', [userController::class, 'fetchSubjects'])->name('su
 Route::post('/timetable/map', [userController::class, 'mapTimetable'])->name('timetable.map'); // Add this line
 Route::get('/ftimetable', function () {
     if (!session()->has('fid')) {
-        return redirect()->route('logout');
+        return redirect()->route('log`out');
     }
     $response = response()->view('facultytimetable');
-return $response
-    ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
-    ->header('Pragma', 'no-cache')
-    ->header('Expires', '0');
-
+    return $response
+        ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        ->header('Pragma', 'no-cache')
+        ->header('Expires', '0');
 })->name('ftimetable');
+
+Route::get('/students/fetch', function (Request $request) {
+    $subjectCode = $request->input('subjectcode');
+    $cid = session('cid');
+
+    // Fetch assigned faculty from the subjects table
+    $assignedFaculty = DB::table('subjects')
+        ->where('subjectcode', $subjectCode)
+        ->where('cid', $cid)
+        ->select('fac1id', 'fac2id', 'fname1', 'fname2')
+        ->first();
+
+    $faculty = [];
+    if ($assignedFaculty) {
+        if ($assignedFaculty->fac1id) {
+            $faculty[] = ['fid' => $assignedFaculty->fac1id, 'name' => $assignedFaculty->fname1];
+        }
+        if ($assignedFaculty->fac2id) {
+            $faculty[] = ['fid' => $assignedFaculty->fac2id, 'name' => $assignedFaculty->fname2];
+        }
+    }
+    // Fetch students from the student table
+    $students = DB::table('student')
+        ->where('dept', session('dept'))
+        ->where('Batch', session('batch'))
+        ->where('section', session('sec'))
+        ->where('semester', session('semester'))
+        ->select('uid', 'sname', 'sid')
+        ->get();
+
+    return response()->json([
+        'status' => 'success',
+        'data' => [
+            'assignedFaculty' => $faculty,
+            'students' => $students
+        ]
+    ]);
+})->name('students.fetch');
