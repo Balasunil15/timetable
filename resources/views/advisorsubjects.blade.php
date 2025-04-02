@@ -895,7 +895,6 @@
         const subjectcode = $(this).closest('tr').find('td:first').text().trim();
         const subjectname = $(this).closest('tr').find('td:nth-child(2)').text().trim();
         const subjecttype = $(this).closest('tr').find('td:nth-child(4)').text().trim().toLowerCase();
-
         $('#subjectcode').val(subjectcode);
         $('#subjectname').val(subjectname);
         $('#subjecttype').val(subjecttype);
@@ -965,6 +964,108 @@
                     icon: 'error',
                     title: 'Error',
                     text: 'An error occurred while processing your request.',
+                    confirmButtonText: 'Ok'
+                });
+            }
+        });
+    });
+
+    // Update the student mapping form handler
+    $('#studentMapping').on('submit', function(e) {
+        e.preventDefault();
+        console.log("Form submitted");
+
+        const facultyId = $('#facultyDropdown').val();
+        console.log("Faculty ID:", facultyId);
+
+        const $modal = $(this).closest('.modal');
+        const $button = $modal.find('button[data-subjectcode]');
+        const subjectCode = $button.data('subjectcode');
+        console.log("Subject Code:", subjectCode);
+
+        // Get subject name from button data attribute
+        const subjectName = $button.data('subjectname');
+        console.log("Subject Name:", subjectName);
+
+        // Get all checked checkboxes
+        const selectedStudents = [];
+        $('#studentsModal input[type="checkbox"]:checked').each(function() {
+            const studentId = $(this).attr('id').replace('student', '');
+            selectedStudents.push(studentId);
+        });
+        console.log("Selected Students:", selectedStudents);
+
+        if (!facultyId) {
+            console.log("Error: No faculty selected");
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please select a faculty',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        }
+
+        if (selectedStudents.length === 0) {
+            console.log("Error: No students selected");
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please select at least one student',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        }
+
+        // Send AJAX request to map students
+        console.log("Sending AJAX request with data:", {
+            subjectcode: subjectCode,
+            facultyId: facultyId,
+            selectedStudents: selectedStudents
+        });
+
+        $.ajax({
+            url: "{{ route('student.map') }}",
+            type: "POST",
+            data: {
+                subjectcode: subjectCode,
+                facultyId: facultyId,
+                selectedStudents: selectedStudents
+            },
+            success: function(response) {
+                console.log("AJAX Success Response:", response);
+                if (response.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        confirmButtonText: 'Ok'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $('#studentsModal').modal('hide');
+                            location.reload();
+                        }
+                    });
+                } else {
+                    console.log("AJAX Error Response:", response);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message,
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log("AJAX Error:", {
+                    xhr: xhr,
+                    status: status,
+                    error: error
+                });
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while mapping students.',
                     confirmButtonText: 'Ok'
                 });
             }

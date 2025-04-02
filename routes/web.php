@@ -136,3 +136,74 @@ Route::get('/students/fetch', function (Request $request) {
 })->name('students.fetch');
 
 Route::get('/ftimetable/data', [userController::class, 'getFacultyTimetableData'])->name('ftimetable.data');
+
+// Add this new route
+Route::post('/student/map', function (Request $request) {
+    $subjectCode = $request->input('subjectcode');
+    $facultyId = $request->input('facultyId');
+    $selectedStudents = $request->input('selectedStudents');
+    $cid = session('cid');
+
+    // Get subject details from both tables
+    $subjectFromSubjects = DB::table('subjects')
+        ->where('subjectcode', $subjectCode)
+        ->where('cid', $cid)
+        ->first();
+
+    $subjectFromCourses = DB::table('courses')
+        ->where('subcode', $subjectCode)
+        ->first();
+
+    if (!$subjectFromCourses) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Subject not found in courses'
+        ]);
+    }
+
+    // Get faculty name
+    $faculty = DB::table('faculty')
+        ->where('fid', $facultyId)
+        ->first();
+
+    if (!$faculty) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Faculty not found'
+        ]);
+    }
+
+    try {
+        // Insert entries for each selected student
+        foreach ($selectedStudents as $studentId) {
+            // Check if mapping already exists
+            $exists = DB::table('attendance_map')
+                ->where('cid', $cid)
+                ->where('sid', $studentId)
+                ->where('subject_code', $subjectCode)
+                ->exists();
+
+            if (!$exists) {
+                DB::table('attendance_map')->insert([
+                    'cid' => $cid,
+                    'sid' => $studentId,
+                    'subject_code' => $subjectCode,
+                    'subject_name' => $subjectFromCourses->subname, // Using subname from courses table
+                    'fac_id' => $facultyId,
+                    'fac_name' => $faculty->name,
+                    'attendance' => json_encode([])
+                ]);
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Students mapped successfully'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Error mapping students: ' . $e->getMessage()
+        ]);
+    }
+})->name('student.map');
