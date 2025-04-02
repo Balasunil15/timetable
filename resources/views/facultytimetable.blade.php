@@ -324,56 +324,56 @@
                 <tbody>
                     <tr>
                         <td class="text-center">Monday</td>
-                        <td></td>
-                        <td></td>
+                        <td data-day="Monday" data-hour="1"></td>
+                        <td data-day="Monday" data-hour="2"></td>
                         <td rowspan="6" class="align-middle bg-light">Break</td>
-                        <td></td>
-                        <td></td>
+                        <td data-day="Monday" data-hour="3"></td>
+                        <td data-day="Monday" data-hour="4"></td>
                         <td rowspan="6" class="align-middle bg-light">Lunch</td>
-                        <td></td>
+                        <td data-day="Monday" data-hour="5"></td>
                         <td rowspan="6" class="align-middle bg-light">Break</td>
-                        <td></td>
-                        <td></td>
+                        <td data-day="Monday" data-hour="6"></td>
+                        <td data-day="Monday" data-hour="7"></td>
                     </tr>
                     <tr>
                         <td class="text-center">Tuesday</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td data-day="Tuesday" data-hour="1"></td>
+                        <td data-day="Tuesday" data-hour="2"></td>
+                        <td data-day="Tuesday" data-hour="3"></td>
+                        <td data-day="Tuesday" data-hour="4"></td>
+                        <td data-day="Tuesday" data-hour="5"></td>
+                        <td data-day="Tuesday" data-hour="6"></td>
+                        <td data-day="Tuesday" data-hour="7"></td>
                     </tr>
                     <tr>
                         <td class="text-center">Wednesday</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td data-day="Wednesday" data-hour="1"></td>
+                        <td data-day="Wednesday" data-hour="2"></td>
+                        <td data-day="Wednesday" data-hour="3"></td>
+                        <td data-day="Wednesday" data-hour="4"></td>
+                        <td data-day="Wednesday" data-hour="5"></td>
+                        <td data-day="Wednesday" data-hour="6"></td>
+                        <td data-day="Wednesday" data-hour="7"></td>
                     </tr>
                     <tr>
                         <td class="text-center">Thursday</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td data-day="Thursday" data-hour="1"></td>
+                        <td data-day="Thursday" data-hour="2"></td>
+                        <td data-day="Thursday" data-hour="3"></td>
+                        <td data-day="Thursday" data-hour="4"></td>
+                        <td data-day="Thursday" data-hour="5"></td>
+                        <td data-day="Thursday" data-hour="6"></td>
+                        <td data-day="Thursday" data-hour="7"></td>
                     </tr>
                     <tr>
                         <td class="text-center">Friday</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td data-day="Friday" data-hour="1"></td>
+                        <td data-day="Friday" data-hour="2"></td>
+                        <td data-day="Friday" data-hour="3"></td>
+                        <td data-day="Friday" data-hour="4"></td>
+                        <td data-day="Friday" data-hour="5"></td>
+                        <td data-day="Friday" data-hour="6"></td>
+                        <td data-day="Friday" data-hour="7"></td>
                     </tr>
                 </tbody>
             </table>
@@ -578,6 +578,22 @@ document.addEventListener("DOMContentLoaded", function () {
     // Initialize everything
     setActiveMenuItem();
     initializeEventListeners();
+    
+    // Fetch timetable data and populate table cells
+    $.ajax({
+        url: "/getTimetableData",  // Route that calls the usercontroller function
+        method: "GET",
+        success: function(data) {
+            data.forEach(function(record) {
+                // record contains: { day, hour, subject_name, dept, sec }
+                $("td[data-day='" + record.day + "'][data-hour='" + record.hour + "']")
+                    .html(record.subject_name + "<br>" + record.dept + "<br>" + record.sec);
+            });
+        },
+        error: function(err) {
+            console.error("Error fetching timetable data", err);
+        }
+    });
 });
 $.ajaxSetup({
             headers: {
