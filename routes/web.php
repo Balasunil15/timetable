@@ -134,3 +134,5 @@ Route::get('/students/fetch', function (Request $request) {
         ]
     ]);
 })->name('students.fetch');
+
+Route::get('/ftimetable/data', [userController::class, 'getFacultyTimetableData'])->name('ftimetable.data');

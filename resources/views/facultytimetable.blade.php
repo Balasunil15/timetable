@@ -407,183 +407,243 @@
 
     <!-- Footer -->
     @include ('footer')
-<script>
-    const loaderContainer = document.getElementById('loaderContainer');
+    <script>
+        const loaderContainer = document.getElementById('loaderContainer');
 
-function showLoader() {
-    loaderContainer.classList.add('show');
-}
+        function showLoader() {
+            loaderContainer.classList.add('show');
+        }
 
-function hideLoader() {
-    loaderContainer.classList.remove('show');
-}
+        function hideLoader() {
+            loaderContainer.classList.remove('show');
+        }
 
-//    automatic loader
-document.addEventListener('DOMContentLoaded', function () {
-    const loaderContainer = document.getElementById('loaderContainer');
-    let loadingTimeout;
+        //    automatic loader
+        document.addEventListener('DOMContentLoaded', function () {
+            const loaderContainer = document.getElementById('loaderContainer');
+            let loadingTimeout;
 
-    function hideLoader() {
-        loaderContainer.classList.add('hide');
-    }
-
-    function showError() {
-        console.error('Page load took too long or encountered an error');
-        // You can add custom error handling here
-    }
-
-    // Set a maximum loading time (10 seconds)
-    loadingTimeout = setTimeout(showError, 10000);
-
-    // Hide loader when everything is loaded
-    window.onload = function () {
-        clearTimeout(loadingTimeout);
-
-        // Add a small delay to ensure smooth transition
-        setTimeout(hideLoader, 500);
-    };
-
-    // Error handling
-    window.onerror = function (msg, url, lineNo, columnNo, error) {
-        clearTimeout(loadingTimeout);
-        showError();
-        return false;
-    };
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    // Cache DOM elements
-    const elements = {
-        hamburger: document.getElementById('hamburger'),
-        sidebar: document.getElementById('sidebar'),
-        mobileOverlay: document.getElementById('mobileOverlay'),
-        menuItems: document.querySelectorAll('.menu-item'),
-        submenuItems: document.querySelectorAll('.submenu-item') // Add submenu items to cache
-    };
-
-    // Set active menu item based on current path
-    function setActiveMenuItem() {
-        const currentPath = window.location.pathname.split('/').pop();
-
-        // Clear all active states first
-        elements.menuItems.forEach(item => item.classList.remove('active'));
-        elements.submenuItems.forEach(item => item.classList.remove('active'));
-
-        // Check main menu items
-        elements.menuItems.forEach(item => {
-            const itemPath = item.getAttribute('href')?.replace('/', '');
-            if (itemPath === currentPath) {
-                item.classList.add('active');
-                // If this item has a parent submenu, activate it too
-                const parentSubmenu = item.closest('.submenu');
-                const parentMenuItem = parentSubmenu?.previousElementSibling;
-                if (parentSubmenu && parentMenuItem) {
-                    parentSubmenu.classList.add('active');
-                    parentMenuItem.classList.add('active');
-                }
+            function hideLoader() {
+                loaderContainer.classList.add('hide');
             }
+
+            function showError() {
+                console.error('Page load took too long or encountered an error');
+                // You can add custom error handling here
+            }
+
+            // Set a maximum loading time (10 seconds)
+            loadingTimeout = setTimeout(showError, 10000);
+
+            // Hide loader when everything is loaded
+            window.onload = function () {
+                clearTimeout(loadingTimeout);
+
+                // Add a small delay to ensure smooth transition
+                setTimeout(hideLoader, 500);
+            };
+
+            // Error handling
+            window.onerror = function (msg, url, lineNo, columnNo, error) {
+                clearTimeout(loadingTimeout);
+                showError();
+                return false;
+            };
         });
 
-        // Check submenu items
-        elements.submenuItems.forEach(item => {
-            const itemPath = item.getAttribute('href')?.replace('/', '');
-            if (itemPath === currentPath) {
-                item.classList.add('active');
-                // Activate parent submenu and its trigger
-                const parentSubmenu = item.closest('.submenu');
-                const parentMenuItem = parentSubmenu?.previousElementSibling;
-                if (parentSubmenu && parentMenuItem) {
-                    parentSubmenu.classList.add('active');
-                    parentMenuItem.classList.add('active');
+        document.addEventListener("DOMContentLoaded", function () {
+            // Cache DOM elements
+            const elements = {
+                hamburger: document.getElementById('hamburger'),
+                sidebar: document.getElementById('sidebar'),
+                mobileOverlay: document.getElementById('mobileOverlay'),
+                menuItems: document.querySelectorAll('.menu-item'),
+                submenuItems: document.querySelectorAll('.submenu-item') // Add submenu items to cache
+            };
+
+            // Set active menu item based on current path
+            function setActiveMenuItem() {
+                const currentPath = window.location.pathname.split('/').pop();
+
+                // Clear all active states first
+                elements.menuItems.forEach(item => item.classList.remove('active'));
+                elements.submenuItems.forEach(item => item.classList.remove('active'));
+
+                // Check main menu items
+                elements.menuItems.forEach(item => {
+                    const itemPath = item.getAttribute('href')?.replace('/', '');
+                    if (itemPath === currentPath) {
+                        item.classList.add('active');
+                        // If this item has a parent submenu, activate it too
+                        const parentSubmenu = item.closest('.submenu');
+                        const parentMenuItem = parentSubmenu?.previousElementSibling;
+                        if (parentSubmenu && parentMenuItem) {
+                            parentSubmenu.classList.add('active');
+                            parentMenuItem.classList.add('active');
+                        }
+                    }
+                });
+
+                // Check submenu items
+                elements.submenuItems.forEach(item => {
+                    const itemPath = item.getAttribute('href')?.replace('/', '');
+                    if (itemPath === currentPath) {
+                        item.classList.add('active');
+                        // Activate parent submenu and its trigger
+                        const parentSubmenu = item.closest('.submenu');
+                        const parentMenuItem = parentSubmenu?.previousElementSibling;
+                        if (parentSubmenu && parentMenuItem) {
+                            parentSubmenu.classList.add('active');
+                            parentMenuItem.classList.add('active');
+                        }
+                    }
+                });
+            }
+
+            // Handle mobile sidebar toggle
+            function handleSidebarToggle() {
+                if (window.innerWidth <= 768) {
+                    elements.sidebar.classList.toggle('mobile-show');
+                    elements.mobileOverlay.classList.toggle('show');
+                    document.body.classList.toggle('sidebar-open');
+                } else {
+                    elements.sidebar.classList.toggle('collapsed');
                 }
             }
-        });
-    }
 
-    // Handle mobile sidebar toggle
-    function handleSidebarToggle() {
-        if (window.innerWidth <= 768) {
-            elements.sidebar.classList.toggle('mobile-show');
-            elements.mobileOverlay.classList.toggle('show');
-            document.body.classList.toggle('sidebar-open');
-        } else {
-            elements.sidebar.classList.toggle('collapsed');
-        }
-    }
+            // Handle window resize
+            function handleResize() {
+                if (window.innerWidth <= 768) {
+                    elements.sidebar.classList.remove('collapsed');
+                    elements.sidebar.classList.remove('mobile-show');
+                    elements.mobileOverlay.classList.remove('show');
+                    document.body.classList.remove('sidebar-open');
+                } else {
+                    elements.sidebar.style.transform = '';
+                    elements.mobileOverlay.classList.remove('show');
+                    document.body.classList.remove('sidebar-open');
+                }
+            }
 
-    // Handle window resize
-    function handleResize() {
-        if (window.innerWidth <= 768) {
-            elements.sidebar.classList.remove('collapsed');
-            elements.sidebar.classList.remove('mobile-show');
-            elements.mobileOverlay.classList.remove('show');
-            document.body.classList.remove('sidebar-open');
-        } else {
-            elements.sidebar.style.transform = '';
-            elements.mobileOverlay.classList.remove('show');
-            document.body.classList.remove('sidebar-open');
-        }
-    }
+            // Toggle User Menu
+            const userMenu = document.getElementById('userMenu');
+            const dropdownMenu = userMenu.querySelector('.dropdown-menu');
+            userMenu.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('show');
+            });
 
-    // Toggle User Menu
-    const userMenu = document.getElementById('userMenu');
-    const dropdownMenu = userMenu.querySelector('.dropdown-menu');
-    userMenu.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdownMenu.classList.toggle('show');
-    });
+            // Close dropdown when clicking outside
+            document.addEventListener('click', () => {
+                dropdownMenu.classList.remove('show');
+            });
 
-    // Close dropdown when clicking outside
-    document.addEventListener('click', () => {
-        dropdownMenu.classList.remove('show');
-    });
+            // Enhanced Toggle Submenu with active state handling
+            const menuItems = document.querySelectorAll('.has-submenu');
+            menuItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault(); // Prevent default if it's a link
+                    const submenu = item.nextElementSibling;
 
-    // Enhanced Toggle Submenu with active state handling
-    const menuItems = document.querySelectorAll('.has-submenu');
-    menuItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault(); // Prevent default if it's a link
-            const submenu = item.nextElementSibling;
+                    // Toggle active state for the clicked menu item and its submenu
+                    item.classList.toggle('active');
+                    submenu.classList.toggle('active');
 
-            // Toggle active state for the clicked menu item and its submenu
-            item.classList.toggle('active');
-            submenu.classList.toggle('active');
-
-            // Handle submenu item clicks
-            const submenuItems = submenu.querySelectorAll('.submenu-item');
-            submenuItems.forEach(submenuItem => {
-                submenuItem.addEventListener('click', (e) => {
-                    // Remove active class from all submenu items
-                    submenuItems.forEach(si => si.classList.remove(
-                        'active'));
-                    // Add active class to clicked submenu item
-                    submenuItem.classList.add('active');
-                    e.stopPropagation(); // Prevent event from bubbling up
+                    // Handle submenu item clicks
+                    const submenuItems = submenu.querySelectorAll('.submenu-item');
+                    submenuItems.forEach(submenuItem => {
+                        submenuItem.addEventListener('click', (e) => {
+                            // Remove active class from all submenu items
+                            submenuItems.forEach(si => si.classList.remove(
+                                'active'));
+                            // Add active class to clicked submenu item
+                            submenuItem.classList.add('active');
+                            e.stopPropagation(); // Prevent event from bubbling up
+                        });
+                    });
                 });
             });
+
+            // Initialize event listeners
+            function initializeEventListeners() {
+                // Sidebar toggle for mobile and desktop
+                if (elements.hamburger && elements.mobileOverlay) {
+                    elements.hamburger.addEventListener('click', handleSidebarToggle);
+                    elements.mobileOverlay.addEventListener('click', handleSidebarToggle);
+                }
+                // Window resize handler
+                window.addEventListener('resize', handleResize);
+            }
+
+            // Initialize everything
+            setActiveMenuItem();
+            initializeEventListeners();
         });
-    });
 
-    // Initialize event listeners
-    function initializeEventListeners() {
-        // Sidebar toggle for mobile and desktop
-        if (elements.hamburger && elements.mobileOverlay) {
-            elements.hamburger.addEventListener('click', handleSidebarToggle);
-            elements.mobileOverlay.addEventListener('click', handleSidebarToggle);
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTimetableData();
+        });
+
+        function loadTimetableData() {
+            fetch('/ftimetable/data')
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                        updateTimetableCells(result.data);
+                    } else {
+                        console.error('Failed to load timetable data:', result.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         }
-        // Window resize handler
-        window.addEventListener('resize', handleResize);
-    }
 
-    // Initialize everything
-    setActiveMenuItem();
-    initializeEventListeners();
-});
-$.ajaxSetup({
+        function updateTimetableCells(mappings) {
+            const rows = document.querySelectorAll('#timetable tbody tr');
+            rows.forEach(row => {
+                const day = row.cells[0].textContent.trim();
+                const dayData = mappings[day] || {};
+
+                for (let i = 1; i < row.cells.length; i++) {
+                    const cell = row.cells[i];
+                    if (cell.classList.contains('bg-light')) continue;
+
+                    const hour = getHourFromIndex(i);
+                    const hourData = dayData[hour] || [];
+
+                    if (hourData.length > 0) {
+                        let html = '<div class="timetable-cell">';
+                        hourData.forEach(subject => {
+                            html += `<div class="subject-info">
+                                <strong>${subject.subject_code}</strong><br>
+                                ${subject.subname}<br>
+                                <small>Dept: ${subject.dept} | Sec: ${subject.sec} | Batch: ${subject.batch}</small>
+                            </div>`;
+                        });
+                        html += '</div>';
+                        cell.innerHTML = html;
+                        cell.classList.add('has-subject');
+                    }
+                }
+            });
+        }
+
+        function getHourFromIndex(index) {
+            const hourMap = {
+                1: '1st Hr',
+                2: '2nd Hr',
+                4: '3rd Hr',
+                5: '4th Hr',
+                7: '5th Hr',
+                9: '6th Hr',
+                10: '7th Hr'
+            };
+            return hourMap[index] || '';
+        }
+        $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-</script>
+    </script>
 </body>
 </html>

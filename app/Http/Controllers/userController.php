@@ -657,4 +657,37 @@ class userController extends Controller
         }
     }
 
+    public function getFacultyTimetableData()
+    {
+        try {
+            $fid = session('fid');
+            
+            $mappings = DB::table('timetable_map as tm')
+                ->join('advisor as adv', 'tm.cid', '=', 'adv.cid')
+                ->join('courses as c', 'tm.subject_code', '=', 'c.subcode')
+                ->where('tm.fid', $fid)
+                ->select(
+                    'tm.day', 
+                    'tm.hour', 
+                    'tm.subject_code',
+                    'c.subname',
+                    'adv.dept',
+                    'adv.sec',
+                    'adv.batch'
+                )
+                ->get()
+                ->groupBy(['day', 'hour']);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $mappings
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch timetable data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 }
