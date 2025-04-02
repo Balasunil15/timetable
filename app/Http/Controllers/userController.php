@@ -71,7 +71,7 @@ class userController extends Controller
 
     public function subjects(Request $request)
     {
-        if (!session()->has('fid')) {
+        if (session()->get('role') !== 'hod') {
             return redirect()->route('logout');
         }
         $dept = $request->session()->get('dept');
@@ -80,7 +80,12 @@ class userController extends Controller
             ->where('dept', $dept)
             ->get();
 
-        return view('subjects', compact('courses'));
+            $response = response()->view('subjects', compact('courses'));
+            return $response
+                ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', '0');
+            
     }
 
     public function storeCourse(Request $request)
@@ -258,7 +263,12 @@ class userController extends Controller
             ->where('role', 'faculty')
             ->where('advisor', '!=', 1)
             ->get();
-        return view('advisors', compact('sections', 'advisorRecords', 'facultyList'));
+            $response = response()->view('advisors', compact('sections', 'advisorRecords', 'facultyList'));
+            return $response
+                ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', '0');
+            
     }
 
     public function storeAdvisor(Request $request)
@@ -396,7 +406,12 @@ class userController extends Controller
             ->where('semester', $semester)
             ->get();
 
-        return view('students', compact('students'));
+            $response = response()->view('students', compact('students'));
+            return $response
+                ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', '0');
+            
     }
 
     public function advisorsubjects(Request $request)
@@ -409,7 +424,12 @@ class userController extends Controller
             ->select('subcode', 'subname', 'credits', 'type')
             ->where('dept', $dept)
             ->get();
-        return view('advisorsubjects', compact('courses'));
+            $response = response()->view('advisorsubjects', compact('courses'));
+            return $response
+                ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', '0');
+             
     }
 
     public function assignSubject(Request $request)
