@@ -69,10 +69,12 @@ Route::post('/subject/remove', [userController::class, 'removeSubject'])->name('
 // Updated route to use userController for fetching students
 Route::get('/students/fetch', [userController::class, 'fetchStudents'])->name('students.fetch');
 
-// Timetable Route
+// Timetable Routes
 Route::get('/timetable', function () {
     return view('facultysubject');
 })->name('timetable');
 
+Route::get('/timetable/data', [userController::class, 'getTimetableData'])->name('timetable.data');
 
-Route::get('/subjectsfetch', [userController::class, 'fetchsubjects'])->name('subjects.fetch');
+Route::get('/subjectsfetch', [userController::class, 'fetchSubjects'])->name('subjects.fetch');
+Route::post('/timetable/map', [userController::class, 'mapTimetable'])->name('timetable.map'); // Add this line

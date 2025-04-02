@@ -1,12 +1,13 @@
 <?php
 
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
-use Maatwebsite\Excel\Facades\Excel;
 
 
 class userController extends Controller
@@ -504,17 +505,22 @@ class userController extends Controller
         }
     }
 
-
     public function fetchSubjects(Request $request)
     {
-        $dept = session('dept');
-        $cid = session('cid');
-
         try {
             $subjects = DB::table('subjects')
-                ->where('dept', $dept)
-                ->where('cid', $cid)
-                ->get(['subjectcode', 'subjectname', 'fname1', 'fname2']);
+                ->select('subjectcode', 'subjectname', 'fname1', 'fname2', 'fac1id', 'fac2id')
+                ->where('dept', session('dept'))
+                ->where('cid', session('cid'))
+                ->where('semester', session('semester'))
+                ->get();
+
+            if ($subjects->isEmpty()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No subjects found for this class'
+                ]);
+            }
 
             return response()->json([
                 'status' => 'success',
@@ -523,8 +529,111 @@ class userController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Failed to fetch subjects. Please try again.'
+                'message' => 'Failed to fetch subjects: ' . $e->getMessage()
             ]);
+        }
+    }
+
+    public function getTimetableData()
+    {
+        try {
+            $cid = session('cid');
+            $mappings = DB::table('timetable_map as tm')
+                ->join('subjects as s', 'tm.subject_code', '=', 's.subjectcode')
+                ->where('tm.cid', $cid)
+                ->select('tm.day', 'tm.hour', 'tm.subject_code', 's.subjectname', 's.fname1', 's.fname2')
+                ->get()
+                ->groupBy(['day', 'hour']);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $mappings
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch timetable data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function mapTimetable(Request $request)
+    {
+        try {
+            $cid = session('cid');
+            
+            // Log incoming data for debugging
+            Log::info('Incoming request data:', $request->all());
+
+            // Validate input
+            $validated = $request->validate([
+                'day' => 'required|string',
+                'hour' => 'required|string',
+                'subject_code1' => 'required|string',
+                'fac1_id' => 'required',  // Remove string validation to accept numeric
+                'subject_code2' => 'nullable|string',
+                'fac2_id' => 'nullable'   // Remove string validation to accept numeric
+            ]);
+
+            // Check for faculty scheduling conflicts
+            $facultyConflict = DB::table('timetable_map')
+                ->where('day', $request->day)
+                ->where('hour', $request->hour)
+                ->where(function($query) use ($request) {
+                    $query->where('fid', intval($request->fac1_id));
+                    if ($request->fac2_id) {
+                        $query->orWhere('fid', intval($request->fac2_id));
+                    }
+                })
+                ->first();
+
+            if ($facultyConflict) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'One or more faculty members are already scheduled during this time slot'
+                ]);
+            }
+
+            
+
+            // Insert first subject with explicit type casting
+            DB::table('timetable_map')->insert([
+                'cid' => $cid,
+                'day' => $request->day,
+                'hour' => $request->hour,
+                'subject_code' => $request->subject_code1,
+                'fid' => intval($request->fac1_id)  // Ensure integer conversion
+            ]);
+
+            // Insert second subject if provided
+            if ($request->subject_code2 && $request->fac2_id) {
+                DB::table('timetable_map')->insert([
+                    'cid' => $cid,
+                    'day' => $request->day,
+                    'hour' => $request->hour,
+                    'subject_code' => $request->subject_code2,
+                    'fid' => intval($request->fac2_id)  // Ensure integer conversion
+                ]);
+            }
+
+            DB::commit();
+
+            // Log successful insertion
+            Log::info('Successfully mapped timetable with fac1_id: ' . $request->fac1_id);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Timetable mapping saved successfully',
+                'reload' => true
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to save timetable mapping: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to save timetable mapping: ' . $e->getMessage()
+            ], 500);
         }
     }
 

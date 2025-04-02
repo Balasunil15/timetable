@@ -9,6 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
@@ -389,24 +390,16 @@
                         <p id="modalInfo"></p>
                         <div class="row">
                             <div class="col-md-6">
-                                <label for="subjectSelect" class="form-label">Select Subject 1:</label>
-                                <select class="form-select" id="subjectSelect">
-                                    <option value="Math">Mathematics</option>
-                                    <option value="Physics">Physics</option>
-                                    <option value="Chemistry">Chemistry</option>
-                                    <option value="Biology">Biology</option>
-                                    <option value="English">English</option>
+                                <label for="subject1Select" class="form-label">Select Subject 1:</label>
+                                <select class="form-select" id="subject1Select">
+                                    <option value="" selected disabled>Select Subject</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label for="facultySelect" class="form-label">Select subject 2:</label>
-                                <select class="form-select" id="facultySelect">
-                                <option value="Math">Mathematics</option>
-                                    <option value="Physics">Physics</option>
-                                    <option value="Chemistry">Chemistry</option>
-                                    <option value="Biology">Biology</option>
-                                    <option value="English">English</option>
-                                    </select>
+                                <label for="subject2Select" class="form-label">Select Subject 2 (Optional):</label>
+                                <select class="form-select" id="subject2Select">
+                                    <option value="" selected disabled>Select Subject</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -463,25 +456,186 @@
         let selectedDay = '';
         let selectedHour = '';
 
-        function openSubjectModal(day, hour) {
+        function openSubjectModal(day, hour, cell = null) {
             selectedDay = day;
             selectedHour = hour;
+            currentCell = cell;
             document.getElementById('modalInfo').textContent = `Day: ${day}, Hour: ${hour}`;
+
+            fetch('/subjectsfetch')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        populateSubjectDropdowns(data.data);
+                    } else {
+                        throw new Error(data.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function populateSubjectDropdowns(subjects) {
+            const subject1Select = document.getElementById('subject1Select');
+            const subject2Select = document.getElementById('subject2Select');
+            
+            // Clear existing options
+            subject1Select.innerHTML = '<option value="" selected disabled>Select Subject</option>';
+            subject2Select.innerHTML = '<option value="" selected disabled>Select Subject</option>';
+            
+            subjects.forEach(subject => {
+                const optionText = `${subject.subjectcode} - ${subject.subjectname} (${subject.fname1}${subject.fname2 ? ', ' + subject.fname2 : ''})`;
+                const option1 = new Option(optionText, subject.subjectcode);
+                const option2 = new Option(optionText, subject.subjectcode);
+                
+                // Add faculty IDs as data attributes
+                option1.dataset.fac1id = subject.fac1id;
+                option1.dataset.fac2id = subject.fac2id;
+                option2.dataset.fac1id = subject.fac1id;
+                option2.dataset.fac2id = subject.fac2id;
+                
+                subject1Select.add(option1);
+                subject2Select.add(option2);
+            });
+            
+            subject1Select.onchange = updateSecondDropdown;
+        }
+
+        function updateSecondDropdown() {
+            const subject1Select = document.getElementById('subject1Select');
+            const subject2Select = document.getElementById('subject2Select');
+            const selectedValue = subject1Select.value;
+            
+            Array.from(subject2Select.options).forEach(option => {
+                option.disabled = option.value === selectedValue;
+            });
         }
 
         function saveSubject() {
-            const selectedSubject = document.getElementById('subjectSelect').value;
-            const selectedFaculty = document.getElementById('facultySelect').value;
+            const subject1Select = document.getElementById('subject1Select');
+            const subject2Select = document.getElementById('subject2Select');
 
-            if (!selectedSubject || !selectedFaculty) {
-                alert('Please select both a subject and a faculty.');
+            if (!subject1Select.value) {
+                alert('Please select at least Subject 1.');
                 return;
             }
 
-            alert(`Saved ${selectedSubject} with ${selectedFaculty} for ${selectedDay}, Hour ${selectedHour}`);
-            // Close the modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('subjectModal'));
-            modal.hide();
+            const selected1 = subject1Select.options[subject1Select.selectedIndex];
+            const selected2 = subject2Select.value ? subject2Select.options[subject2Select.selectedIndex] : null;
+
+            // Prepare data for saving
+            const data = {
+                day: selectedDay,
+                hour: selectedHour,
+                subject_code1: subject1Select.value,
+                fac1_id: selected1.dataset.fac1id,
+                subject_code2: subject2Select.value || null,
+                fac2_id: selected2 ? selected2.dataset.fac1id : null
+            };
+
+            // Send data to backend
+            fetch('/timetable/map', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('subjectModal'));
+                    modal.hide();
+
+                    // Reload the entire timetable data
+                    loadTimetableData();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Timetable updated successfully'
+                    });
+                } else {
+                    // Check if the error is related to faculty scheduling conflict
+                    if (result.message && result.message.includes('faculty')) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Scheduling Conflict',
+                            text: 'One or more faculty members are already scheduled during this time slot'
+                        }).then(() => {
+                            location.reload(); // Reload the page after clicking OK
+                        });
+                    } else {
+                        throw new Error(result.message || 'Failed to save timetable mapping');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to save timetable mapping'
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTimetableData();
+        });
+
+        function loadTimetableData() {
+            fetch('/timetable/data')
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                        updateTimetableCells(result.data);
+                    } else {
+                        console.error('Failed to load timetable data:', result.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function updateTimetableCells(mappings) {
+            const rows = document.querySelectorAll('#timetable tbody tr');
+            rows.forEach(row => {
+                const day = row.cells[0].textContent.trim();
+                const dayData = mappings[day] || {};
+
+                // For each hour cell (skip first column and break/lunch columns)
+                for (let i = 1; i < row.cells.length; i++) {
+                    const cell = row.cells[i];
+                    if (cell.classList.contains('bg-light')) continue; // Skip break/lunch cells
+
+                    const hour = getHourFromIndex(i);
+                    const hourData = dayData[hour] || [];
+
+                    if (hourData.length > 0) {
+                        let html = '<div class="selected-subjects">';
+                        hourData.forEach(subject => {
+                            html += `<div class="selected-subject">${subject.subject_code} - ${subject.subjectname} (${subject.fname1}${subject.fname2 ? ', ' + subject.fname2 : ''})</div>`;
+                        });
+                        html += `<div class="edit-subjects" onclick="openSubjectModal('${day}', '${hour}', this.closest('td'))">
+                            <i class="fas fa-edit"></i> Edit
+                        </div></div>`;
+                        cell.innerHTML = html;
+                    }
+                }
+            });
+        }
+
+        function getHourFromIndex(index) {
+            const hourMap = {
+                1: '1st Hr',
+                2: '2nd Hr',
+                4: '3rd Hr',
+                5: '4th Hr',
+                7: '5th Hr',
+                9: '6th Hr',
+                10: '7th Hr'
+            };
+            return hourMap[index] || '';
         }
     </script>
 </body>
