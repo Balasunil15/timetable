@@ -88,7 +88,7 @@ Route::get('/subjectsfetch', [userController::class, 'fetchSubjects'])->name('su
 Route::post('/timetable/map', [userController::class, 'mapTimetable'])->name('timetable.map'); // Add this line
 Route::get('/ftimetable', function () {
     if (!session()->has('fid')) {
-        return redirect()->route('log`out');
+        return redirect()->route('logout');
     }
     $response = response()->view('facultytimetable');
     return $response
