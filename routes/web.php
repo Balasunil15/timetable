@@ -71,7 +71,14 @@ Route::get('/students/fetch', [userController::class, 'fetchStudents'])->name('s
 
 // Timetable Routes
 Route::get('/timetable', function () {
-    return view('facultysubject');
+    if (!session()->has('fid')) {
+        return redirect()->route('login');
+    }
+    $response = response()->view('facultysubject');
+    return $response
+        ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        ->header('Pragma', 'no-cache')
+        ->header('Expires', '0');
 })->name('timetable');
 
 Route::get('/timetable/data', [userController::class, 'getTimetableData'])->name('timetable.data');
