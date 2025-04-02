@@ -86,5 +86,13 @@ Route::get('/timetable/data', [userController::class, 'getTimetableData'])->name
 Route::get('/subjectsfetch', [userController::class, 'fetchSubjects'])->name('subjects.fetch');
 Route::post('/timetable/map', [userController::class, 'mapTimetable'])->name('timetable.map'); // Add this line
 Route::get('/ftimetable', function () {
-    return view('facultytimetable');
+    if (!session()->has('fid')) {
+        return redirect()->route('logout');
+    }
+    $response = response()->view('facultytimetable');
+return $response
+    ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+    ->header('Pragma', 'no-cache')
+    ->header('Expires', '0');
+
 })->name('ftimetable');
