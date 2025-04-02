@@ -200,11 +200,6 @@
             <i class="fas fa-tachometer-alt text-primary"></i>
             <span>Dashboard</span>
         </a>
-        <a href="{{ route('ftimetable') }}"
-            class="menu-item {{ request()->routeIs('ftimetable') ? 'active' : '' }}">
-            <i class="fas fa-chalkboard-teacher text-info"></i>
-            <span>My timetable</span>
-        </a>
         @if (session('advisor') == 1)
         <a href="{{ route('advisorsubjects') }}"
             class="menu-item {{ request()->routeIs('advisorsubjects') ? 'active' : '' }}">
