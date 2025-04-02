@@ -607,39 +607,57 @@
             // Set subject details in the modal
             $('#studentsModalLabel').text(`Select Students for ${subjectName} (${subjectCode})`);
 
-            // Fetch students dynamically based on advisor's department, section, and batch
+            // Fetch assigned faculty and students dynamically
             $.ajax({
-                url: "{{ route('students.fetch') }}", // Define this route in your web.php
+                url: "{{ route('students.fetch') }}",
                 type: "GET",
-                data: {
-                    dept: "{{ session('dept') }}", // Advisor's department
-                    section: "{{ session('sec') }}", // Advisor's section
-                    batch: "{{ session('batch') }}" // Advisor's batch
-                },
+                data: { subjectcode: subjectCode },
                 success: function (response) {
                     if (response.status === 'success') {
-                        const studentsList = response.data;
-                        const leftColumn = $('#studentsModal .list-group').first();
-                        const rightColumn = $('#studentsModal .list-group').last();
+                        const { students, assignedFaculty } = response.data;
+                        const facultyDropdown = $('#facultyDropdown');
+                        const studentsListFirstHalf = $('#studentsListFirstHalf');
+                        const studentsListSecondHalf = $('#studentsListSecondHalf');
 
-                        // Clear existing student lists
-                        leftColumn.empty();
-                        rightColumn.empty();
+                        // Clear existing faculty dropdown and student lists
+                        facultyDropdown.empty();
+                        studentsListFirstHalf.empty();
+                        studentsListSecondHalf.empty();
 
-                        // Populate students dynamically
-                        studentsList.forEach((student, index) => {
+                        // Populate assigned faculty in the dropdown
+                        if (assignedFaculty.length > 0) {
+                            assignedFaculty.forEach(faculty => {
+                                facultyDropdown.append(
+                                    `<option value="${faculty.fid}">${faculty.name}</option>`
+                                );
+                            });
+                            facultyDropdown.prop('disabled', false);
+                        } else {
+                            facultyDropdown.append('<option>No faculty assigned</option>');
+                            facultyDropdown.prop('disabled', true);
+                        }
+
+                        // Split students into two halves and populate dynamically
+                        const half = Math.ceil(students.length / 2);
+                        students.forEach((student, index) => {
                             const studentItem = `
                                 <li class="list-group-item">
                                     <input type="checkbox" id="student${student.uid}" name="student${student.uid}">
                                     <label for="student${student.uid}">${student.sname} (${student.sid})</label>
                                 </li>
                             `;
-                            if (index % 2 === 0) {
-                                leftColumn.append(studentItem);
+                            if (index < half) {
+                                studentsListFirstHalf.append(studentItem);
                             } else {
-                                rightColumn.append(studentItem);
+                                studentsListSecondHalf.append(studentItem);
                             }
                         });
+
+                        // Handle case when no students are found
+                        if (students.length === 0) {
+                            studentsListFirstHalf.append('<li class="list-group-item text-center">No students found</li>');
+                            studentsListSecondHalf.append('<li class="list-group-item text-center">No students found</li>');
+                        }
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -653,7 +671,7 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Failed to fetch students. Please try again.',
+                        text: 'Failed to fetch students or faculty. Please try again.',
                         confirmButtonText: 'Ok'
                     });
                 }
@@ -679,7 +697,8 @@
                                 <td class="text-center">
                                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentsModal" 
                                         data-subjectcode="${subject.subjectcode}" 
-                                        data-subjectname="${subject.subjectname}">
+                                        data-subjectname="${subject.subjectname}"
+                                        data-facultyname="${subject.fname1} ${subject.fname2 ? ', ' + subject.fname2 : ''}">
 
                                         Select Students
                                     </button>
@@ -764,61 +783,42 @@
                 </div>
                 <div class="modal-body">
                     <div class="row mb-3">
-                        <div class="col-md-2">
-                            <button class="btn btn-outline-primary w-100" onclick="selectAllStudents()">Select
-                                All</button>
-                        </div>
-                        <div class="col-md-2">
-                            <button class="btn btn-outline-primary w-100" onclick="selectOddStudents()">Odd
-                                Students</button>
-                        </div>
-                        <div class="col-md-2">
-                            <button class="btn btn-outline-primary w-100" onclick="selectEvenStudents()">Even
-                                Students</button>
-                        </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-outline-primary w-100" onclick="selectFirstHalfStudents()">1st Half
-                                Students</button>
-                        </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-outline-primary w-100" onclick="selectSecondHalfStudents()">2nd Half
-                                Students</button>
+                        <div class="col-md-12">
+                            <label for="facultyDropdown" class="form-label">Select Assigned Faculty:</label>
+                            <select class="form-select" id="facultyDropdown" name="facultyDropdown">
+                                <option selected disabled>Loading...</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mb-3">
                         <div class="col-md-6">
-                            <ul class="list-group">
-                                <li class="list-group-item">
-                                    <input type="checkbox" id="student1" name="student1">
-                                    <label for="student1">Student 1 (ID: 001)</label>
-                                </li>
-                                <li class="list-group-item">
-                                    <input type="checkbox" id="student2" name="student2">
-                                    <label for="student2">Student 2 (ID: 002)</label>
-                                </li>
-                                <li class="list-group-item">
-                                    <input type="checkbox" id="student3" name="student3">
-                                    <label for="student3">Student 3 (ID: 003)</label>
-                                </li>
-                                <!-- Add more students as needed -->
+                            <label for="studentsListFirstHalf" class="form-label">First Half Students:</label>
+                            <ul class="list-group" id="studentsListFirstHalf">
+                                <li class="list-group-item text-center">Loading students...</li>
                             </ul>
                         </div>
                         <div class="col-md-6">
-                            <ul class="list-group">
-                                <li class="list-group-item">
-                                    <input type="checkbox" id="student4" name="student4">
-                                    <label for="student4">Student 4 (ID: 004)</label>
-                                </li>
-                                <li class="list-group-item">
-                                    <input type="checkbox" id="student5" name="student5">
-                                    <label for="student5">Student 5 (ID: 005)</label>
-                                </li>
-                                <li class="list-group-item">
-                                    <input type="checkbox" id="student6" name="student6">
-                                    <label for="student6">Student 6 (ID: 006)</label>
-                                </li>
-                                <!-- Add more students as needed -->
+                            <label for="studentsListSecondHalf" class="form-label">Second Half Students:</label>
+                            <ul class="list-group" id="studentsListSecondHalf">
+                                <li class="list-group-item text-center">Loading students...</li>
                             </ul>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-primary w-100" onclick="selectAllStudents()">Select All</button>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-primary w-100" onclick="selectOddStudents()">Odd Students</button>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-primary w-100" onclick="selectEvenStudents()">Even Students</button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-primary w-100" onclick="selectFirstHalfStudents()">1st Half Students</button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-primary w-100" onclick="selectSecondHalfStudents()">2nd Half Students</button>
                         </div>
                     </div>
                 </div>
