@@ -22,8 +22,8 @@ Route::get('/logout', [userController::class, 'logout'])->name('logout'); // Log
 
 // Dashboard Routes
 Route::get('/hoddashboard', function () {
-    if (!session()->has('fid')) {
-        return redirect()->route('login');
+    if (session()->get('role') !== 'hod') {
+        return redirect()->route('logout');
     }
     $response = response()->view('hoddashboard');
     return $response
@@ -34,7 +34,7 @@ Route::get('/hoddashboard', function () {
 
 Route::get('/facultydashboard', function () {
     if (!session()->has('fid')) {
-        return redirect()->route('login');
+        return redirect()->route('logout');
     }
     $response = response()->view('facultydashboard');
     return $response
@@ -71,8 +71,8 @@ Route::get('/students/fetch', [userController::class, 'fetchStudents'])->name('s
 
 // Timetable Routes
 Route::get('/timetable', function () {
-    if (!session()->has('fid')) {
-        return redirect()->route('login');
+    if (!session()->has('cid')) {
+        return redirect()->route('logout');
     }
     $response = response()->view('facultysubject');
     return $response

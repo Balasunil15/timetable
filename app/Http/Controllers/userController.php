@@ -72,7 +72,7 @@ class userController extends Controller
     public function subjects(Request $request)
     {
         if (!session()->has('fid')) {
-            return redirect()->route('login');
+            return redirect()->route('logout');
         }
         $dept = $request->session()->get('dept');
         $courses = DB::table('courses')
@@ -243,8 +243,8 @@ class userController extends Controller
 
     public function advisors(Request $request)
     {
-        if (!session()->has('fid')) {
-            return redirect()->route('login');
+        if (session()->get('role') !== 'hod') {
+            return redirect()->route('logout');
         }
         $dept = $request->session()->get('dept');
         // Retrieve sections record and decode the JSON sections
@@ -380,8 +380,8 @@ class userController extends Controller
 
     public function studentslist(Request $request)
     {
-        if (!session()->has('fid')) {
-            return redirect()->route('login');
+        if (!session()->has('cid')) {
+            return redirect()->route('logout');
         }
         $dept = $request->session()->get('dept');
         $batch = $request->session()->get('batch');
@@ -401,8 +401,8 @@ class userController extends Controller
 
     public function advisorsubjects(Request $request)
     {
-        if (!session()->has('fid')) {
-            return redirect()->route('login');
+        if (!session()->has('cid')) {
+            return redirect()->route('logout');
         }
         $dept = $request->session()->get('dept');
         $courses = DB::table('courses')
