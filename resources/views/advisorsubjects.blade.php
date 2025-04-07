@@ -604,10 +604,14 @@
 
     // When a "Select Students" button is clicked, fetch students dynamically
     $(document).on('click', '.btn-primary[data-bs-target="#studentsModal"]', function() {
-        const subjectCode = $(this).closest('tr').find('td:first').text().trim();
-        const subjectName = $(this).closest('tr').find('td:nth-child(2)').text().trim();
+        const subjectCode = $(this).data('subjectcode');
+        const subjectName = $(this).data('subjectname');
 
-        // Set subject details in the modal
+        // Set the subject details in the modal's data attributes
+        $('#studentsModal').data('subjectcode', subjectCode);
+        $('#studentsModal').data('subjectname', subjectName);
+
+        // Update the modal title
         $('#studentsModalLabel').text(`Select Students for ${subjectName} (${subjectCode})`);
 
         // Fetch assigned faculty and students dynamically
@@ -734,6 +738,398 @@
                 confirmButtonText: 'Ok'
             });
         }
+    });
+
+    $('#studentMapping').on('submit', function(e) {
+        e.preventDefault();
+
+        // Fetch subjectcode, subjectname, fac_id, and fac_name from the modal's data attributes
+        const subjectCode = $('#studentsModal').data('subjectcode');
+        const subjectName = $('#studentsModal').data('subjectname');
+        const facId = $('#facultyDropdown').val(); // Get selected faculty ID
+        const facName = $('#facultyDropdown option:selected').text(); // Get selected faculty name
+        const selectedStudents = [];
+
+        // Collect selected student IDs
+        $('#studentsModal input[type="checkbox"]:checked').each(function() {
+            const studentId = $(this).attr('id').replace('student', '');
+            selectedStudents.push(parseInt(studentId));
+        });
+
+        if (!subjectCode || !subjectName || !facId || !facName) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Subject code, name, and faculty are required.',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        }
+
+        if (selectedStudents.length === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please select at least one student.',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        }
+
+        // Send AJAX request to store attendance map
+        $.ajax({
+            url: "{{ route('attendance.map.store') }}",
+            type: "POST",
+            data: {
+                subjectcode: subjectCode,
+                subjectname: subjectName,
+                fac_id: facId,
+                fac_name: facName, // Include fac_name in the request
+                student_ids: selectedStudents
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        confirmButtonText: 'Ok'
+                    }).then(() => {
+                        $('#studentsModal').modal('hide');
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message,
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while saving the attendance map.',
+                    confirmButtonText: 'Ok'
+                });
+            }
+        });
+    });
+
+    // When a "Choose Faculty" button is clicked in the table row, set the hidden fields in the modal
+    $(document).on('click', '.btn-primary[data-bs-target="#facultyModal"]', function() {
+        const subjectcode = $(this).closest('tr').find('td:first').text().trim();
+        const subjectname = $(this).closest('tr').find('td:nth-child(2)').text().trim();
+        const subjecttype = $(this).closest('tr').find('td:nth-child(4)').text().trim().toLowerCase();
+        $('#subjectcode').val(subjectcode);
+        $('#subjectname').val(subjectname);
+        $('#subjecttype').val(subjecttype);
+
+        // Enable or disable the second faculty dropdown based on subject type
+        if (subjecttype === 'lab') {
+            $('#facultySelect2').prop('disabled', false);
+        } else {
+            $('#facultySelect2').prop('disabled', false); // Allow two faculties for theory
+        }
+    });
+
+    // On facultyModal form submission, validate and send AJAX POST to assign the subject
+    $('#assignSubjectForm').on('submit', function(e) {
+        e.preventDefault();
+
+        const subjecttype = $('#subjecttype').val();
+        const faculty1 = $('#facultySelect1').val();
+        const faculty2 = $('#facultySelect2').val();
+
+        // Validation: Ensure at least one faculty is selected
+        if (!faculty1) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'At least one faculty must be selected.',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        }
+
+        // If only one faculty is selected, set the second faculty to null
+        const formData = {
+            subjectcode: $('#subjectcode').val(),
+            subjectname: $('#subjectname').val(),
+            fid1: faculty1,
+            fid2: faculty2 || null // Set to null if not selected
+        };
+
+        $.ajax({
+            url: "{{ route('subject.assign') }}",
+            type: "POST",
+            data: formData,
+            success: function(response) {
+                if (response.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        confirmButtonText: 'Ok'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.reload();
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message,
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while processing your request.',
+                    confirmButtonText: 'Ok'
+                });
+            }
+        });
+    });
+
+    // Update the student mapping form handler
+    $('#studentMapping').on('submit', function(e) {
+        e.preventDefault();
+
+        // Fetch subjectcode and subjectname from the modal's data attributes
+        const subjectCode = $('#studentsModal').data('subjectcode');
+        const subjectName = $('#studentsModal').data('subjectname');
+        const selectedStudents = [];
+
+        // Collect selected student IDs
+        $('#studentsModal input[type="checkbox"]:checked').each(function() {
+            const studentId = $(this).attr('id').replace('student', '');
+            selectedStudents.push(parseInt(studentId));
+        });
+
+        if (!subjectCode || !subjectName) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Subject code and name are required.',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        }
+
+        if (selectedStudents.length === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please select at least one student.',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        }
+
+        // Send AJAX request to store attendance map
+        $.ajax({
+            url: "{{ route('attendance.map.store') }}",
+            type: "POST",
+            data: {
+                subjectcode: subjectCode,
+                subjectname: subjectName,
+                student_ids: selectedStudents
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        confirmButtonText: 'Ok'
+                    }).then(() => {
+                        $('#studentsModal').modal('hide');
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message,
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while saving the attendance map.',
+                    confirmButtonText: 'Ok'
+                });
+            }
+        });
+    });
+
+    // When a "Choose Faculty" button is clicked in the table row, set the hidden fields in the modal
+    $(document).on('click', '.btn-primary[data-bs-target="#facultyModal"]', function() {
+        const subjectcode = $(this).closest('tr').find('td:first').text().trim();
+        const subjectname = $(this).closest('tr').find('td:nth-child(2)').text().trim();
+        const subjecttype = $(this).closest('tr').find('td:nth-child(4)').text().trim().toLowerCase();
+        $('#subjectcode').val(subjectcode);
+        $('#subjectname').val(subjectname);
+        $('#subjecttype').val(subjecttype);
+
+        // Enable or disable the second faculty dropdown based on subject type
+        if (subjecttype === 'lab') {
+            $('#facultySelect2').prop('disabled', false);
+        } else {
+            $('#facultySelect2').prop('disabled', false); // Allow two faculties for theory
+        }
+    });
+
+    // On facultyModal form submission, validate and send AJAX POST to assign the subject
+    $('#assignSubjectForm').on('submit', function(e) {
+        e.preventDefault();
+
+        const subjecttype = $('#subjecttype').val();
+        const faculty1 = $('#facultySelect1').val();
+        const faculty2 = $('#facultySelect2').val();
+
+        // Validation: Ensure at least one faculty is selected
+        if (!faculty1) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'At least one faculty must be selected.',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        }
+
+        // If only one faculty is selected, set the second faculty to null
+        const formData = {
+            subjectcode: $('#subjectcode').val(),
+            subjectname: $('#subjectname').val(),
+            fid1: faculty1,
+            fid2: faculty2 || null // Set to null if not selected
+        };
+
+        $.ajax({
+            url: "{{ route('subject.assign') }}",
+            type: "POST",
+            data: formData,
+            success: function(response) {
+                if (response.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        confirmButtonText: 'Ok'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.reload();
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message,
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while processing your request.',
+                    confirmButtonText: 'Ok'
+                });
+            }
+        });
+    });
+
+    // Update the student mapping form handler
+    $('#studentMapping').on('submit', function(e) {
+        e.preventDefault();
+
+        // Fetch subjectcode, subjectname, fac_id, and fac_name from the modal's data attributes
+        const subjectCode = $('#studentsModal').data('subjectcode');
+        const subjectName = $('#studentsModal').data('subjectname');
+        const facId = $('#facultyDropdown').val(); // Get selected faculty ID
+        const facName = $('#facultyDropdown option:selected').text(); // Get selected faculty name
+        const selectedStudents = [];
+
+        // Collect selected student IDs
+        $('#studentsModal input[type="checkbox"]:checked').each(function() {
+            const studentId = $(this).attr('id').replace('student', '');
+            selectedStudents.push(parseInt(studentId));
+        });
+
+        if (!subjectCode || !subjectName || !facId || !facName) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Subject code, name, and faculty are required.',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        }
+
+        if (selectedStudents.length === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please select at least one student.',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        }
+
+        // Send AJAX request to store attendance map
+        $.ajax({
+            url: "{{ route('attendance.map.store') }}",
+            type: "POST",
+            data: {
+                subjectcode: subjectCode,
+                subjectname: subjectName,
+                fac_id: facId,
+                fac_name: facName, // Include fac_name in the request
+                student_ids: selectedStudents
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        confirmButtonText: 'Ok'
+                    }).then(() => {
+                        $('#studentsModal').modal('hide');
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message,
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while saving the attendance map.',
+                    confirmButtonText: 'Ok'
+                });
+            }
+        });
     });
     </script>
 
@@ -973,81 +1369,63 @@
     // Update the student mapping form handler
     $('#studentMapping').on('submit', function(e) {
         e.preventDefault();
-        console.log("Form submitted");
 
-        const facultyId = $('#facultyDropdown').val();
-        console.log("Faculty ID:", facultyId);
-
-        const $modal = $(this).closest('.modal');
-        const $button = $modal.find('button[data-subjectcode]');
-        const subjectCode = $button.data('subjectcode');
-        console.log("Subject Code:", subjectCode);
-
-        // Get subject name from button data attribute
-        const subjectName = $button.data('subjectname');
-        console.log("Subject Name:", subjectName);
-
-        // Get all checked checkboxes
+        // Fetch subjectcode, subjectname, fac_id, and fac_name from the modal's data attributes
+        const subjectCode = $('#studentsModal').data('subjectcode');
+        const subjectName = $('#studentsModal').data('subjectname');
+        const facId = $('#facultyDropdown').val(); // Get selected faculty ID
+        const facName = $('#facultyDropdown option:selected').text(); // Get selected faculty name
         const selectedStudents = [];
+
+        // Collect selected student IDs
         $('#studentsModal input[type="checkbox"]:checked').each(function() {
             const studentId = $(this).attr('id').replace('student', '');
-            selectedStudents.push(studentId);
+            selectedStudents.push(parseInt(studentId));
         });
-        console.log("Selected Students:", selectedStudents);
 
-        if (!facultyId) {
-            console.log("Error: No faculty selected");
+        if (!subjectCode || !subjectName || !facId || !facName) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'Please select a faculty',
+                text: 'Subject code, name, and faculty are required.',
                 confirmButtonText: 'Ok'
             });
             return;
         }
 
         if (selectedStudents.length === 0) {
-            console.log("Error: No students selected");
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'Please select at least one student',
+                text: 'Please select at least one student.',
                 confirmButtonText: 'Ok'
             });
             return;
         }
 
-        // Send AJAX request to map students
-        console.log("Sending AJAX request with data:", {
-            subjectcode: subjectCode,
-            facultyId: facultyId,
-            selectedStudents: selectedStudents
-        });
-
+        // Send AJAX request to store attendance map
         $.ajax({
-            url: "{{ route('student.map') }}",
+            url: "{{ route('attendance.map.store') }}",
             type: "POST",
             data: {
                 subjectcode: subjectCode,
-                facultyId: facultyId,
-                selectedStudents: selectedStudents
+                subjectname: subjectName,
+                fac_id: facId,
+                fac_name: facName, // Include fac_name in the request
+                student_ids: selectedStudents
             },
             success: function(response) {
-                console.log("AJAX Success Response:", response);
                 if (response.status === 'success') {
                     Swal.fire({
                         icon: 'success',
                         title: 'Success',
                         text: response.message,
                         confirmButtonText: 'Ok'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $('#studentsModal').modal('hide');
-                            location.reload();
-                        }
+                    }).then(() => {
+                        $('#studentsModal').modal('hide');
+                        location.reload();
                     });
                 } else {
-                    console.log("AJAX Error Response:", response);
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -1056,16 +1434,11 @@
                     });
                 }
             },
-            error: function(xhr, status, error) {
-                console.log("AJAX Error:", {
-                    xhr: xhr,
-                    status: status,
-                    error: error
-                });
+            error: function() {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'An error occurred while mapping students.',
+                    text: 'An error occurred while saving the attendance map.',
                     confirmButtonText: 'Ok'
                 });
             }

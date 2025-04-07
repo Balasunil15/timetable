@@ -207,3 +207,5 @@ Route::post('/student/map', function (Request $request) {
         ]);
     }
 })->name('student.map');
+
+Route::post('/attendance-map/store', [App\Http\Controllers\userController::class, 'storeAttendanceMap'])->name('attendance.map.store');

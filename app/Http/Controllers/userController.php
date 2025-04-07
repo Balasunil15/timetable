@@ -441,7 +441,12 @@ class userController extends Controller
             'fid2' => 'nullable|string'
         ]);
 
+        // Retrieve cid from the session of the logged-in advisor
         $cid = session('cid');
+        if (!$cid) {
+            return response()->json(['status' => 'error', 'message' => 'Advisor session not found.'], 400);
+        }
+
         $dept = session('dept');
         $batch = session('batch');
         $sec = session('sec');
@@ -461,8 +466,8 @@ class userController extends Controller
             'cid' => $cid,
             'subjectcode' => $data['subjectcode'],
             'subjectname' => $data['subjectname'],
-            'fac1id'=>$faculty1->fid,
-            'fac2id'=>$faculty2 ?$faculty2->fid:null,
+            'fac1id' => $faculty1->fid,
+            'fac2id' => $faculty2 ? $faculty2->fid : null,
             'fname1' => $faculty1->name,
             'fname2' => $faculty2 ? $faculty2->name : null,
             'semester' => $semester,
@@ -480,7 +485,12 @@ class userController extends Controller
     public function removeSubject(Request $request)
     {
         $subjectcode = $request->input('subjectcode');
+
+        // Retrieve cid from the session of the logged-in advisor
         $cid = session('cid');
+        if (!$cid) {
+            return response()->json(['status' => 'error', 'message' => 'Advisor session not found.'], 400);
+        }
 
         $deleted = DB::table('subjects')
             ->where('subjectcode', $subjectcode)
@@ -686,6 +696,49 @@ class userController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to fetch timetable data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function storeAttendanceMap(Request $request)
+    {
+        $data = $request->validate([
+            'subjectcode' => 'required|string',
+            'subjectname' => 'required|string',
+            'fac_id' => 'required|integer', // Validate faculty ID
+            'fac_name' => 'required|string', // Validate faculty name
+            'student_ids' => 'required|array',
+            'student_ids.*' => 'integer' // Ensure student IDs are integers
+        ]);
+
+        // Retrieve cid from the session of the logged-in advisor
+        $cid = session('cid');
+        if (!$cid) {
+            return response()->json(['status' => 'error', 'message' => 'Advisor session not found.'], 400);
+        }
+
+        try {
+            // Insert each student's attendance record into the attendance_map table
+            foreach ($data['student_ids'] as $sid) {
+                DB::table('attendance_map')->insert([
+                    'cid' => $cid,
+                    'sid' => $sid,
+                    'subject_code' => $data['subjectcode'],
+                    'subject_name' => $data['subjectname'],
+                    'fac_id' => $data['fac_id'], // Include faculty ID
+                    'fac_name' => $data['fac_name'], // Include faculty name
+                    'attendance' => json_encode([]) // Initialize attendance as an empty JSON array
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Attendance map saved successfully!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to save attendance map: ' . $e->getMessage()
             ], 500);
         }
     }
