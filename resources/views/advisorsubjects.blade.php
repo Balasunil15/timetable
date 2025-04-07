@@ -1077,18 +1077,21 @@
         const checkboxes = document.querySelectorAll(
             `#faculty${facultyNumber}-content .list-group-item input[type="checkbox"]`);
         checkboxes.forEach(checkbox => checkbox.checked = true);
+        updateStudentAvailability();
     }
 
     function selectOddStudents(facultyNumber) {
         const checkboxes = document.querySelectorAll(
             `#faculty${facultyNumber}-content .list-group-item input[type="checkbox"]`);
         checkboxes.forEach((checkbox, index) => checkbox.checked = (index % 2 === 0));
+        updateStudentAvailability();
     }
 
     function selectEvenStudents(facultyNumber) {
         const checkboxes = document.querySelectorAll(
             `#faculty${facultyNumber}-content .list-group-item input[type="checkbox"]`);
         checkboxes.forEach((checkbox, index) => checkbox.checked = (index % 2 !== 0));
+        updateStudentAvailability();
     }
 
     function selectFirstHalfStudents(facultyNumber) {
@@ -1096,6 +1099,7 @@
             `#faculty${facultyNumber}-content .list-group-item input[type="checkbox"]`);
         const half = Math.ceil(checkboxes.length / 2);
         checkboxes.forEach((checkbox, index) => checkbox.checked = (index < half));
+        updateStudentAvailability();
     }
 
     function selectSecondHalfStudents(facultyNumber) {
@@ -1103,106 +1107,82 @@
             `#faculty${facultyNumber}-content .list-group-item input[type="checkbox"]`);
         const half = Math.ceil(checkboxes.length / 2);
         checkboxes.forEach((checkbox, index) => checkbox.checked = (index >= half));
+        updateStudentAvailability();
     }
 
     function submitStudentSelection() {
         const subjectCode = $('#studentsModal').data('subjectcode');
         const subjectName = $('#studentsModal').data('subjectname');
-        let hasError = false;
 
-        // Function to collect students for a faculty
-        const collectStudentsForFaculty = (facultyNum) => {
-            const selectedStudents = [];
-            const facId = $(`#facultyDropdown${facultyNum}`).val();
-            const facName = $(`#facultyDropdown${facultyNum} option:selected`).text();
+        // Get selected students for faculty 1
+        const selectedStudents1 = [];
+        const fac1Id = $('#facultyDropdown1').val();
+        const fac1Name = $('#facultyDropdown1 option:selected').text();
+        $('#faculty1-content input[type="checkbox"]:checked').each(function() {
+            selectedStudents1.push(parseInt($(this).attr('id').replace('student', '').replace('_fac1', '')));
+        });
 
-            $(`#faculty${facultyNum}-content input[type="checkbox"]:checked`).each(function() {
-                const studentId = $(this).attr('id').replace(`student`, '').replace(`_fac${facultyNum}`,
-                    '');
-                selectedStudents.push(parseInt(studentId));
-            });
+        // Get selected students for faculty 2
+        const selectedStudents2 = [];
+        const fac2Id = $('#facultyDropdown2').val();
+        const fac2Name = $('#facultyDropdown2 option:selected').text();
+        $('#faculty2-content input[type="checkbox"]:checked').each(function() {
+            selectedStudents2.push(parseInt($(this).attr('id').replace('student', '').replace('_fac2', '')));
+        });
 
-            return {
-                facId,
-                facName,
-                selectedStudents
-            };
-        };
-
-        // Collect data for both faculties
-        const faculty1Data = collectStudentsForFaculty(1);
-        const faculty2Data = collectStudentsForFaculty(2);
-
-        // Validate and send requests
+        // Save assignments for both faculties
         const promises = [];
 
-        if (faculty1Data.facId && faculty1Data.selectedStudents.length > 0) {
-            promises.push(
-                $.ajax({
-                    url: "{{ route('attendance.map.store') }}",
-                    type: "POST",
-                    data: {
-                        subjectcode: subjectCode,
-                        subjectname: subjectName,
-                        fac_id: faculty1Data.facId,
-                        fac_name: faculty1Data.facName,
-                        student_ids: faculty1Data.selectedStudents
-                    }
-                })
-            );
+        if (fac1Id && selectedStudents1.length > 0) {
+            promises.push($.ajax({
+                url: "{{ route('attendance.map.store') }}",
+                type: "POST",
+                data: {
+                    subjectcode: subjectCode,
+                    subjectname: subjectName,
+                    fac_id: fac1Id,
+                    fac_name: fac1Name,
+                    student_ids: selectedStudents1
+                }
+            }));
         }
 
-        if (faculty2Data.facId && faculty2Data.selectedStudents.length > 0) {
-            promises.push(
-                $.ajax({
-                    url: "{{ route('attendance.map.store') }}",
-                    type: "POST",
-                    data: {
-                        subjectcode: subjectCode,
-                        subjectname: subjectName,
-                        fac_id: faculty2Data.facId,
-                        fac_name: faculty2Data.facName,
-                        student_ids: faculty2Data.selectedStudents
-                    }
-                })
-            );
+        if (fac2Id && selectedStudents2.length > 0) {
+            promises.push($.ajax({
+                url: "{{ route('attendance.map.store') }}",
+                type: "POST",
+                data: {
+                    subjectcode: subjectCode,
+                    subjectname: subjectName,
+                    fac_id: fac2Id,
+                    fac_name: fac2Name,
+                    student_ids: selectedStudents2
+                }
+            }));
         }
 
-        if (promises.length === 0) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Please select at least one faculty and their students'
-            });
-            return;
-        }
-
-        showLoader();
         Promise.all(promises)
             .then(() => {
                 Swal.fire({
                     icon: 'success',
                     title: 'Success',
-                    text: 'Student assignments saved successfully!'
+                    text: 'Student assignments saved successfully!',
+                    confirmButtonText: 'Ok'
                 }).then(() => {
                     $('#studentsModal').modal('hide');
                     location.reload();
                 });
             })
             .catch(error => {
-                console.error('Error:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Failed to save student assignments'
+                    text: 'Failed to save student assignments.',
+                    confirmButtonText: 'Ok'
                 });
-            })
-            .finally(() => {
-                hideLoader();
             });
     }
 
-    // Function to update student availability between faculty tabs
     function updateStudentAvailability() {
         // Get all selected students from faculty 1
         const selectedStudents1 = [];
@@ -1243,68 +1223,17 @@
         });
     }
 
-    // Add event listeners for checkbox changes
     $('#studentsModal').on('shown.bs.modal', function() {
-        // Add change event listeners to faculty 1 and 2 checkboxes
         $('#faculty1-content input[type="checkbox"], #faculty2-content input[type="checkbox"]').on('change',
             updateStudentAvailability);
-
-        // Trigger update when modal is shown
         updateStudentAvailability();
     });
 
-    // Clear selections and reset states when modal is hidden
     $('#studentsModal').on('hidden.bs.modal', function() {
         $('#faculty1-content input[type="checkbox"], #faculty2-content input[type="checkbox"]').prop('checked',
             false).prop('disabled', false);
         $('.list-group-item').removeClass('disabled-student');
     });
-
-    // Add CSS for disabled students
-    $('<style>')
-        .text(`
-        .disabled-student {
-            opacity: 0.6;
-            background-color: #f8f9fa;
-        }
-        .disabled-student label {
-            text-decoration: line-through;
-            color: #6c757d;
-        }
-    `)
-        .appendTo('head');
-
-    // Modify existing selection functions to trigger the update
-    const originalSelectAllStudents = selectAllStudents;
-    selectAllStudents = function(facultyNumber) {
-        originalSelectAllStudents(facultyNumber);
-        updateStudentAvailability();
-    };
-
-    // Repeat similar modifications for other selection functions (selectOddStudents, selectEvenStudents, etc.)
-    const originalSelectOddStudents = selectOddStudents;
-    selectOddStudents = function(facultyNumber) {
-        originalSelectOddStudents(facultyNumber);
-        updateStudentAvailability();
-    };
-
-    const originalSelectEvenStudents = selectEvenStudents;
-    selectEvenStudents = function(facultyNumber) {
-        originalSelectEvenStudents(facultyNumber);
-        updateStudentAvailability();
-    };
-
-    const originalSelectFirstHalfStudents = selectFirstHalfStudents;
-    selectFirstHalfStudents = function(facultyNumber) {
-        originalSelectFirstHalfStudents(facultyNumber);
-        updateStudentAvailability();
-    };
-
-    const originalSelectSecondHalfStudents = selectSecondHalfStudents;
-    selectSecondHalfStudents = function(facultyNumber) {
-        originalSelectSecondHalfStudents(facultyNumber);
-        updateStudentAvailability();
-    };
     </script>
 
     @php
@@ -1569,6 +1498,58 @@
                 });
             });
     }
+
+    function updateStudentAvailability() {
+        // Get all selected students from faculty 1
+        const selectedStudents1 = [];
+        $('#faculty1-content input[type="checkbox"]:checked').each(function() {
+            const studentId = $(this).attr('id').replace('student', '').replace('_fac1', '');
+            selectedStudents1.push(studentId);
+        });
+
+        // Disable selected students in faculty 2
+        $('#faculty2-content input[type="checkbox"]').each(function() {
+            const studentId = $(this).attr('id').replace('student', '').replace('_fac2', '');
+            if (selectedStudents1.includes(studentId)) {
+                $(this).prop('disabled', true);
+                $(this).closest('.list-group-item').addClass('disabled-student');
+            } else {
+                $(this).prop('disabled', false);
+                $(this).closest('.list-group-item').removeClass('disabled-student');
+            }
+        });
+
+        // Get all selected students from faculty 2
+        const selectedStudents2 = [];
+        $('#faculty2-content input[type="checkbox"]:checked').each(function() {
+            const studentId = $(this).attr('id').replace('student', '').replace('_fac2', '');
+            selectedStudents2.push(studentId);
+        });
+
+        // Disable selected students in faculty 1
+        $('#faculty1-content input[type="checkbox"]').each(function() {
+            const studentId = $(this).attr('id').replace('student', '').replace('_fac1', '');
+            if (selectedStudents2.includes(studentId)) {
+                $(this).prop('disabled', true);
+                $(this).closest('.list-group-item').addClass('disabled-student');
+            } else {
+                $(this).prop('disabled', false);
+                $(this).closest('.list-group-item').removeClass('disabled-student');
+            }
+        });
+    }
+
+    $('#studentsModal').on('shown.bs.modal', function() {
+        $('#faculty1-content input[type="checkbox"], #faculty2-content input[type="checkbox"]').on('change',
+            updateStudentAvailability);
+        updateStudentAvailability();
+    });
+
+    $('#studentsModal').on('hidden.bs.modal', function() {
+        $('#faculty1-content input[type="checkbox"], #faculty2-content input[type="checkbox"]').prop('checked',
+            false).prop('disabled', false);
+        $('.list-group-item').removeClass('disabled-student');
+    });
     </script>
 
 </body>
