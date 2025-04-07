@@ -278,6 +278,24 @@ INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, 
 -- Table structure for table `student`
 --
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `subjects`
+--
+
+CREATE TABLE IF NOT EXISTS `subjects` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `subjectcode` VARCHAR(50) NOT NULL,
+  `subjectname` VARCHAR(100) NOT NULL,
+  `subjecttype` VARCHAR(50) NOT NULL,
+  `fid1` INT NOT NULL,
+  `fid2` INT DEFAULT NULL,
+  `cid` INT NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 CREATE TABLE `student` (
   `uid` int(100) NOT NULL,
   `sid` varchar(100) NOT NULL,
