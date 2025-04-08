@@ -907,45 +907,37 @@
     $('#studentMapping').on('submit', function(e) {
         e.preventDefault();
 
-        // Fetch subjectcode and subjectname from the modal's data attributes
         const subjectCode = $('#studentsModal').data('subjectcode');
         const subjectName = $('#studentsModal').data('subjectname');
-        const selectedStudents = [];
+        const faculty1Id = $('#faculty1Dropdown').val();
+        const faculty2Id = $('#faculty2Dropdown').val();
+        const faculty1Name = $('#faculty1Dropdown option:selected').text();
+        const faculty2Name = $('#faculty2Dropdown option:selected').text();
+        const cid = "{{ session('cid') }}"; // Get cid from session
+        const faculty1Students = [];
+        const faculty2Students = [];
 
-        // Collect selected student IDs
-        $('#studentsModal input[type="checkbox"]:checked').each(function() {
-            const studentId = $(this).attr('id').replace('student', '');
-            selectedStudents.push(parseInt(studentId));
+        $('#faculty1Students input[type="checkbox"]:checked').each(function() {
+            faculty1Students.push($(this).val());
         });
 
-        if (!subjectCode || !subjectName) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Subject code and name are required.',
-                confirmButtonText: 'Ok'
-            });
-            return;
-        }
+        $('#faculty2Students input[type="checkbox"]:checked').each(function() {
+            faculty2Students.push($(this).val());
+        });
 
-        if (selectedStudents.length === 0) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Please select at least one student.',
-                confirmButtonText: 'Ok'
-            });
-            return;
-        }
-
-        // Send AJAX request to store attendance map
         $.ajax({
-            url: "{{ route('attendance.map.store') }}",
+            url: "{{ route('student.map') }}",
             type: "POST",
             data: {
+                cid: cid, // Include cid in the form data
                 subjectcode: subjectCode,
-                subjectname: subjectName,
-                student_ids: selectedStudents
+                subjectname: subjectName, // Include subject name
+                faculty1Id: faculty1Id,
+                faculty2Id: faculty2Id,
+                faculty1Name: faculty1Name, // Include faculty1 name
+                faculty2Name: faculty2Name, // Include faculty2 name
+                faculty1Students: faculty1Students,
+                faculty2Students: faculty2Students
             },
             success: function(response) {
                 if (response.status === 'success') {
@@ -971,171 +963,218 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'An error occurred while saving the attendance map.',
+                    text: 'An error occurred while saving the mapping.',
                     confirmButtonText: 'Ok'
                 });
             }
         });
     });
 
-    // When a "Choose Faculty" button is clicked in the table row, set the hidden fields in the modal
-    $(document).on('click', '.btn-primary[data-bs-target="#facultyModal"]', function() {
-        const subjectcode = $(this).closest('tr').find('td:first').text().trim();
-        const subjectname = $(this).closest('tr').find('td:nth-child(2)').text().trim();
-        const subjecttype = $(this).closest('tr').find('td:nth-child(4)').text().trim().toLowerCase();
-        $('#subjectcode').val(subjectcode);
-        $('#subjectname').val(subjectname);
-        $('#subjecttype').val(subjecttype);
+    $(document).on('click', '.btn-primary[data-bs-target="#studentsModal"]', function() {
+        const subjectCode = $(this).data('subjectcode');
+        const subjectName = $(this).data('subjectname');
 
-        // Enable or disable the second faculty dropdown based on subject type
-        if (subjecttype === 'lab') {
-            $('#facultySelect2').prop('disabled', false);
-        } else {
-            $('#facultySelect2').prop('disabled', false); // Allow two faculties for theory
-        }
-    });
-
-    // On facultyModal form submission, validate and send AJAX POST to assign the subject
-    $('#assignSubjectForm').on('submit', function(e) {
-        e.preventDefault();
-
-        const subjecttype = $('#subjecttype').val();
-        const faculty1 = $('#facultySelect1').val();
-        const faculty2 = $('#facultySelect2').val();
-
-        // Validation: Ensure at least one faculty is selected
-        if (!faculty1) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                text: 'At least one faculty must be selected.',
-                confirmButtonText: 'Ok'
-            });
-            return;
-        }
-
-        // If only one faculty is selected, set the second faculty to null
-        const formData = {
-            subjectcode: $('#subjectcode').val(),
-            subjectname: $('#subjectname').val(),
-            fid1: faculty1,
-            fid2: faculty2 || null // Set to null if not selected
-        };
+        $('#studentsModal').data('subjectcode', subjectCode);
+        $('#studentsModal').data('subjectname', subjectName);
+        $('#studentsModalLabel').text(`Select Students for ${subjectName} (${subjectCode})`);
 
         $.ajax({
-            url: "{{ route('subject.assign') }}",
-            type: "POST",
-            data: formData,
-            success: function(response) {
-                if (response.status === 'success') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: response.message,
-                        confirmButtonText: 'Ok'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            location.reload();
-                        }
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: response.message,
-                        confirmButtonText: 'Ok'
-                    });
-                }
-            },
-            error: function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'An error occurred while processing your request.',
-                    confirmButtonText: 'Ok'
-                });
-            }
-        });
-    });
-
-    // Update the student mapping form handler
-    $('#studentMapping').on('submit', function(e) {
-        e.preventDefault();
-
-        // Fetch subjectcode, subjectname, fac_id, and fac_name from the modal's data attributes
-        const subjectCode = $('#studentsModal').data('subjectcode');
-        const subjectName = $('#studentsModal').data('subjectname');
-        const facId = $('#facultyDropdown').val(); // Get selected faculty ID
-        const facName = $('#facultyDropdown option:selected').text(); // Get selected faculty name
-        const selectedStudents = [];
-
-        // Collect selected student IDs
-        $('#studentsModal input[type="checkbox"]:checked').each(function() {
-            const studentId = $(this).attr('id').replace('student', '');
-            selectedStudents.push(parseInt(studentId));
-        });
-
-        if (!subjectCode || !subjectName || !facId || !facName) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Subject code, name, and faculty are required.',
-                confirmButtonText: 'Ok'
-            });
-            return;
-        }
-
-        if (selectedStudents.length === 0) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Please select at least one student.',
-                confirmButtonText: 'Ok'
-            });
-            return;
-        }
-
-        // Send AJAX request to store attendance map
-        $.ajax({
-            url: "{{ route('attendance.map.store') }}",
-            type: "POST",
+            url: "{{ route('students.fetch') }}",
+            type: "GET",
             data: {
-                subjectcode: subjectCode,
-                subjectname: subjectName,
-                fac_id: facId,
-                fac_name: facName, // Include fac_name in the request
-                student_ids: selectedStudents
+                subjectcode: subjectCode
             },
             success: function(response) {
                 if (response.status === 'success') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: response.message,
-                        confirmButtonText: 'Ok'
-                    }).then(() => {
-                        $('#studentsModal').modal('hide');
-                        location.reload();
+                    const {
+                        students,
+                        assignedFaculty
+                    } = response.data;
+
+                    // Populate faculty dropdowns
+                    const faculty1Dropdown = $('#faculty1Dropdown');
+                    const faculty2Dropdown = $('#faculty2Dropdown');
+                    faculty1Dropdown.empty();
+                    faculty2Dropdown.empty();
+
+                    if (assignedFaculty.length > 0) {
+                        assignedFaculty.forEach(faculty => {
+                            faculty1Dropdown.append(
+                                `<option value="${faculty.fid}">${faculty.name}</option>`);
+                            faculty2Dropdown.append(
+                                `<option value="${faculty.fid}">${faculty.name}</option>`);
+                        });
+                    }
+
+                    // Populate student lists with checkboxes
+                    const faculty1Students = $('#faculty1Students');
+                    const faculty2Students = $('#faculty2Students');
+                    faculty1Students.empty();
+                    faculty2Students.empty();
+
+                    students.forEach(student => {
+                        const studentCheckbox1 = `
+                        <li class="list-group-item">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input faculty1-checkbox" 
+                                    id="faculty1_student_${student.uid}" 
+                                    value="${student.uid}" 
+                                    data-student-name="${student.sname}">
+                                <label class="form-check-label" for="faculty1_student_${student.uid}">
+                                    ${student.sname} (${student.sid})
+                                </label>
+                            </div>
+                        </li>`;
+
+                        const studentCheckbox2 = `
+                        <li class="list-group-item">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input faculty2-checkbox" 
+                                    id="faculty2_student_${student.uid}" 
+                                    value="${student.uid}" 
+                                    data-student-name="${student.sname}">
+                                <label class="form-check-label" for="faculty2_student_${student.uid}">
+                                    ${student.sname} (${student.sid})
+                                </label>
+                            </div>
+                        </li>`;
+
+                        faculty1Students.append(studentCheckbox1);
+                        faculty2Students.append(studentCheckbox2);
                     });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: response.message,
-                        confirmButtonText: 'Ok'
+
+                    // Handle checkbox changes for Faculty 1
+                    $('.faculty1-checkbox').on('change', function() {
+                        const studentId = $(this).val();
+                        const isChecked = $(this).prop('checked');
+                        $(`#faculty2_student_${studentId}`).prop('disabled', isChecked);
+                    });
+
+                    // Handle checkbox changes for Faculty 2
+                    $('.faculty2-checkbox').on('change', function() {
+                        const studentId = $(this).val();
+                        const isChecked = $(this).prop('checked');
+                        $(`#faculty1_student_${studentId}`).prop('disabled', isChecked);
+                    });
+
+                    // Update the select all buttons to respect disabled states
+                    $('#selectAllFaculty1').on('click', function() {
+                        $('.faculty1-checkbox:not(:disabled)').prop('checked', true).trigger('change');
+                    });
+
+                    $('#selectAllFaculty2').on('click', function() {
+                        $('.faculty2-checkbox:not(:disabled)').prop('checked', true).trigger('change');
                     });
                 }
-            },
-            error: function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'An error occurred while saving the attendance map.',
-                    confirmButtonText: 'Ok'
-                });
             }
         });
     });
+
+    $(document).on('click', '.btn-primary[data-bs-target="#studentsModal"]', function() {
+        const subjectCode = $(this).data('subjectcode');
+        const subjectName = $(this).data('subjectname');
+
+        $('#studentsModal').data('subjectcode', subjectCode);
+        $('#studentsModal').data('subjectname', subjectName);
+        $('#studentsModalLabel').text(`Select Students for ${subjectName} (${subjectCode})`);
+
+        $.ajax({
+            url: "{{ route('students.fetch') }}",
+            type: "GET",
+            data: { subjectcode: subjectCode },
+            success: function(response) {
+                if (response.status === 'success') {
+                    const { students, assignedFaculty } = response.data;
+                    
+                    // Initialize faculty dropdowns
+                    const faculty1Dropdown = $('#faculty1Dropdown');
+                    const faculty2Dropdown = $('#faculty2Dropdown');
+                    faculty1Dropdown.empty();
+                    faculty2Dropdown.empty();
+
+                    if (assignedFaculty.length > 0) {
+                        assignedFaculty.forEach(faculty => {
+                            faculty1Dropdown.append(`<option value="${faculty.fid}">${faculty.name}</option>`);
+                            faculty2Dropdown.append(`<option value="${faculty.fid}">${faculty.name}</option>`);
+                        });
+                    }
+
+                    // Populate student lists
+                    const faculty1Students = $('#faculty1Students');
+                    const faculty2Students = $('#faculty2Students');
+                    faculty1Students.empty();
+                    faculty2Students.empty();
+
+                    students.forEach(student => {
+                        const checkbox1 = `
+                            <li class="list-group-item">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input student-checkbox" 
+                                        data-faculty="1"
+                                        data-student-id="${student.uid}"
+                                        id="faculty1_${student.uid}" 
+                                        value="${student.uid}">
+                                    <label class="form-check-label" for="faculty1_${student.uid}">
+                                        ${student.sname} (${student.sid})
+                                    </label>
+                                </div>
+                            </li>`;
+
+                        const checkbox2 = `
+                            <li class="list-group-item">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input student-checkbox"
+                                        data-faculty="2"
+                                        data-student-id="${student.uid}"
+                                        id="faculty2_${student.uid}" 
+                                        value="${student.uid}">
+                                    <label class="form-check-label" for="faculty2_${student.uid}">
+                                        ${student.sname} (${student.sid})
+                                    </label>
+                                </div>
+                            </li>`;
+
+                        faculty1Students.append(checkbox1);
+                        faculty2Students.append(checkbox2);
+                    });
+
+                    // Remove any existing event handlers
+                    $(document).off('change', '.student-checkbox');
+
+                    // Add new event handler for checkbox changes
+                    $(document).on('change', '.student-checkbox', function() {
+                        const studentId = $(this).data('student-id');
+                        const facultyNum = $(this).data('faculty');
+                        const isChecked = $(this).prop('checked');
+                        
+                        // Disable/enable the corresponding checkbox in the other faculty tab
+                        const otherFacultyNum = facultyNum === '1' ? '2' : '1';
+                        $(`#faculty${otherFacultyNum}_${studentId}`).prop('disabled', isChecked);
+                    });
+
+                    // Handle tab switching to maintain checkbox states
+                    $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                        const activeTab = $(e.target).attr('id');
+                        const faculty = activeTab === 'faculty1-tab' ? '1' : '2';
+                        const otherFaculty = faculty === '1' ? '2' : '1';
+
+                        // Update disabled states based on selections in the other tab
+                        $(`.student-checkbox[data-faculty="${faculty}"]`).each(function() {
+                            const studentId = $(this).data('student-id');
+                            const isOtherChecked = $(`#faculty${otherFaculty}_${studentId}`).prop('checked');
+                            $(this).prop('disabled', isOtherChecked);
+                        });
+                    });
+                }
+            }
+        });
+    });
+
+    // Update select all function to respect disabled checkboxes
+    function selectAllStudents(e) {
+        e.preventDefault();
+        $('.tab-pane.active .student-checkbox:not(:disabled)').prop('checked', true).trigger('change');
+    }
     </script>
 
     @php
@@ -1194,26 +1233,57 @@
                 </div>
                 <form id="studentMapping">
                     <div class="modal-body">
-                        <div class="row mb-3">
-                            <div class="col-md-12">
-                                <label for="facultyDropdown" class="form-label">Select Assigned Faculty:</label>
-                                <select class="form-select" id="facultyDropdown" name="facultyDropdown">
-                                    <option selected disabled>Loading...</option>
-                                </select>
+                        <ul class="nav nav-tabs" id="facultyTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="faculty1-tab" data-bs-toggle="tab"
+                                    data-bs-target="#faculty1" type="button" role="tab" aria-controls="faculty1"
+                                    aria-selected="true">Faculty 1</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="faculty2-tab" data-bs-toggle="tab"
+                                    data-bs-target="#faculty2" type="button" role="tab" aria-controls="faculty2"
+                                    aria-selected="false">Faculty 2</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="facultyTabsContent">
+                            <!-- Faculty 1 Tab -->
+                            <div class="tab-pane fade show active" id="faculty1" role="tabpanel"
+                                aria-labelledby="faculty1-tab">
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label for="faculty1Dropdown" class="form-label">Select Faculty 1:</label>
+                                        <select class="form-select" id="faculty1Dropdown" name="faculty1Dropdown">
+                                            <option selected disabled>Loading...</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label for="faculty1Students" class="form-label">Select Students:</label>
+                                        <ul class="list-group" id="faculty1Students">
+                                            <li class="list-group-item text-center">Loading students...</li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="studentsListFirstHalf" class="form-label">First Half Students:</label>
-                                <ul class="list-group" id="studentsListFirstHalf">
-                                    <li class="list-group-item text-center">Loading students...</li>
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="studentsListSecondHalf" class="form-label">Second Half Students:</label>
-                                <ul class="list-group" id="studentsListSecondHalf">
-                                    <li class="list-group-item text-center">Loading students...</li>
-                                </ul>
+                            <!-- Faculty 2 Tab -->
+                            <div class="tab-pane fade" id="faculty2" role="tabpanel" aria-labelledby="faculty2-tab">
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label for="faculty2Dropdown" class="form-label">Select Faculty 2:</label>
+                                        <select class="form-select" id="faculty2Dropdown" name="faculty2Dropdown">
+                                            <option selected disabled>Loading...</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label for="faculty2Students" class="form-label">Select Students:</label>
+                                        <ul class="list-group" id="faculty2Students">
+                                            <li class="list-group-item text-center">Loading students...</li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -1251,7 +1321,7 @@
     <script>
     function selectAllStudents(e) {
         e.preventDefault();
-        const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
+        const checkboxes = document.querySelectorAll('.tab-pane.active .list-group-item input[type="checkbox"]');
         checkboxes.forEach(checkbox => {
             checkbox.checked = true;
         });
@@ -1259,7 +1329,7 @@
 
     function selectOddStudents(e) {
         e.preventDefault();
-        const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
+        const checkboxes = document.querySelectorAll('.tab-pane.active .list-group-item input[type="checkbox"]');
         checkboxes.forEach((checkbox, index) => {
             checkbox.checked = (index % 2 === 0);
         });
@@ -1267,7 +1337,7 @@
 
     function selectEvenStudents(e) {
         e.preventDefault();
-        const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
+        const checkboxes = document.querySelectorAll('.tab-pane.active .list-group-item input[type="checkbox"]');
         checkboxes.forEach((checkbox, index) => {
             checkbox.checked = (index % 2 !== 0);
         });
@@ -1275,7 +1345,7 @@
 
     function selectFirstHalfStudents(e) {
         e.preventDefault();
-        const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
+        const checkboxes = document.querySelectorAll('.tab-pane.active .list-group-item input[type="checkbox"]');
         const half = Math.ceil(checkboxes.length / 2);
         checkboxes.forEach((checkbox, index) => {
             checkbox.checked = (index < half);
@@ -1284,7 +1354,7 @@
 
     function selectSecondHalfStudents(e) {
         e.preventDefault();
-        const checkboxes = document.querySelectorAll('#studentsModal .list-group-item input[type="checkbox"]');
+        const checkboxes = document.querySelectorAll('.tab-pane.active .list-group-item input[type="checkbox"]');
         const half = Math.ceil(checkboxes.length / 2);
         checkboxes.forEach((checkbox, index) => {
             checkbox.checked = (index >= half);
@@ -1380,49 +1450,37 @@
     $('#studentMapping').on('submit', function(e) {
         e.preventDefault();
 
-        // Fetch subjectcode, subjectname, fac_id, and fac_name from the modal's data attributes
         const subjectCode = $('#studentsModal').data('subjectcode');
         const subjectName = $('#studentsModal').data('subjectname');
-        const facId = $('#facultyDropdown').val(); // Get selected faculty ID
-        const facName = $('#facultyDropdown option:selected').text(); // Get selected faculty name
-        const selectedStudents = [];
+        const faculty1Id = $('#faculty1Dropdown').val();
+        const faculty2Id = $('#faculty2Dropdown').val();
+        const faculty1Name = $('#faculty1Dropdown option:selected').text();
+        const faculty2Name = $('#faculty2Dropdown option:selected').text();
+        const cid = "{{ session('cid') }}"; // Get cid from session
+        const faculty1Students = [];
+        const faculty2Students = [];
 
-        // Collect selected student IDs
-        $('#studentsModal input[type="checkbox"]:checked').each(function() {
-            const studentId = $(this).attr('id').replace('student', '');
-            selectedStudents.push(parseInt(studentId));
+        $('#faculty1Students input[type="checkbox"]:checked').each(function() {
+            faculty1Students.push($(this).val());
         });
 
-        if (!subjectCode || !subjectName || !facId || !facName) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Subject code, name, and faculty are required.',
-                confirmButtonText: 'Ok'
-            });
-            return;
-        }
+        $('#faculty2Students input[type="checkbox"]:checked').each(function() {
+            faculty2Students.push($(this).val());
+        });
 
-        if (selectedStudents.length === 0) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Please select at least one student.',
-                confirmButtonText: 'Ok'
-            });
-            return;
-        }
-
-        // Send AJAX request to store attendance map
         $.ajax({
-            url: "{{ route('attendance.map.store') }}",
+            url: "{{ route('student.map') }}",
             type: "POST",
             data: {
+                cid: cid, // Include cid in the form data
                 subjectcode: subjectCode,
-                subjectname: subjectName,
-                fac_id: facId,
-                fac_name: facName, // Include fac_name in the request
-                student_ids: selectedStudents
+                subjectname: subjectName, // Include subject name
+                faculty1Id: faculty1Id,
+                faculty2Id: faculty2Id,
+                faculty1Name: faculty1Name, // Include faculty1 name
+                faculty2Name: faculty2Name, // Include faculty2 name
+                faculty1Students: faculty1Students,
+                faculty2Students: faculty2Students
             },
             success: function(response) {
                 if (response.status === 'success') {
@@ -1448,12 +1506,218 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'An error occurred while saving the attendance map.',
+                    text: 'An error occurred while saving the mapping.',
                     confirmButtonText: 'Ok'
                 });
             }
         });
     });
+
+    $(document).on('click', '.btn-primary[data-bs-target="#studentsModal"]', function() {
+        const subjectCode = $(this).data('subjectcode');
+        const subjectName = $(this).data('subjectname');
+
+        $('#studentsModal').data('subjectcode', subjectCode);
+        $('#studentsModal').data('subjectname', subjectName);
+        $('#studentsModalLabel').text(`Select Students for ${subjectName} (${subjectCode})`);
+
+        $.ajax({
+            url: "{{ route('students.fetch') }}",
+            type: "GET",
+            data: {
+                subjectcode: subjectCode
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    const {
+                        students,
+                        assignedFaculty
+                    } = response.data;
+
+                    // Populate faculty dropdowns
+                    const faculty1Dropdown = $('#faculty1Dropdown');
+                    const faculty2Dropdown = $('#faculty2Dropdown');
+                    faculty1Dropdown.empty();
+                    faculty2Dropdown.empty();
+
+                    if (assignedFaculty.length > 0) {
+                        assignedFaculty.forEach(faculty => {
+                            faculty1Dropdown.append(
+                                `<option value="${faculty.fid}">${faculty.name}</option>`);
+                            faculty2Dropdown.append(
+                                `<option value="${faculty.fid}">${faculty.name}</option>`);
+                        });
+                    }
+
+                    // Populate student lists with checkboxes
+                    const faculty1Students = $('#faculty1Students');
+                    const faculty2Students = $('#faculty2Students');
+                    faculty1Students.empty();
+                    faculty2Students.empty();
+
+                    students.forEach(student => {
+                        const studentCheckbox1 = `
+                        <li class="list-group-item">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input faculty1-checkbox" 
+                                    id="faculty1_student_${student.uid}" 
+                                    value="${student.uid}" 
+                                    data-student-name="${student.sname}">
+                                <label class="form-check-label" for="faculty1_student_${student.uid}">
+                                    ${student.sname} (${student.sid})
+                                </label>
+                            </div>
+                        </li>`;
+
+                        const studentCheckbox2 = `
+                        <li class="list-group-item">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input faculty2-checkbox" 
+                                    id="faculty2_student_${student.uid}" 
+                                    value="${student.uid}" 
+                                    data-student-name="${student.sname}">
+                                <label class="form-check-label" for="faculty2_student_${student.uid}">
+                                    ${student.sname} (${student.sid})
+                                </label>
+                            </div>
+                        </li>`;
+
+                        faculty1Students.append(studentCheckbox1);
+                        faculty2Students.append(studentCheckbox2);
+                    });
+
+                    // Handle checkbox changes for Faculty 1
+                    $('.faculty1-checkbox').on('change', function() {
+                        const studentId = $(this).val();
+                        const isChecked = $(this).prop('checked');
+                        $(`#faculty2_student_${studentId}`).prop('disabled', isChecked);
+                    });
+
+                    // Handle checkbox changes for Faculty 2
+                    $('.faculty2-checkbox').on('change', function() {
+                        const studentId = $(this).val();
+                        const isChecked = $(this).prop('checked');
+                        $(`#faculty1_student_${studentId}`).prop('disabled', isChecked);
+                    });
+
+                    // Update the select all buttons to respect disabled states
+                    $('#selectAllFaculty1').on('click', function() {
+                        $('.faculty1-checkbox:not(:disabled)').prop('checked', true).trigger('change');
+                    });
+
+                    $('#selectAllFaculty2').on('click', function() {
+                        $('.faculty2-checkbox:not(:disabled)').prop('checked', true).trigger('change');
+                    });
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '.btn-primary[data-bs-target="#studentsModal"]', function() {
+        const subjectCode = $(this).data('subjectcode');
+        const subjectName = $(this).data('subjectname');
+
+        $('#studentsModal').data('subjectcode', subjectCode);
+        $('#studentsModal').data('subjectname', subjectName);
+        $('#studentsModalLabel').text(`Select Students for ${subjectName} (${subjectCode})`);
+
+        $.ajax({
+            url: "{{ route('students.fetch') }}",
+            type: "GET",
+            data: { subjectcode: subjectCode },
+            success: function(response) {
+                if (response.status === 'success') {
+                    const { students, assignedFaculty } = response.data;
+                    
+                    // Initialize faculty dropdowns
+                    const faculty1Dropdown = $('#faculty1Dropdown');
+                    const faculty2Dropdown = $('#faculty2Dropdown');
+                    faculty1Dropdown.empty();
+                    faculty2Dropdown.empty();
+
+                    if (assignedFaculty.length > 0) {
+                        assignedFaculty.forEach(faculty => {
+                            faculty1Dropdown.append(`<option value="${faculty.fid}">${faculty.name}</option>`);
+                            faculty2Dropdown.append(`<option value="${faculty.fid}">${faculty.name}</option>`);
+                        });
+                    }
+
+                    // Populate student lists
+                    const faculty1Students = $('#faculty1Students');
+                    const faculty2Students = $('#faculty2Students');
+                    faculty1Students.empty();
+                    faculty2Students.empty();
+
+                    students.forEach(student => {
+                        const checkbox1 = `
+                            <li class="list-group-item">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input student-checkbox" 
+                                        data-faculty="1"
+                                        data-student-id="${student.uid}"
+                                        id="faculty1_${student.uid}" 
+                                        value="${student.uid}">
+                                    <label class="form-check-label" for="faculty1_${student.uid}">
+                                        ${student.sname} (${student.sid})
+                                    </label>
+                                </div>
+                            </li>`;
+
+                        const checkbox2 = `
+                            <li class="list-group-item">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input student-checkbox"
+                                        data-faculty="2"
+                                        data-student-id="${student.uid}"
+                                        id="faculty2_${student.uid}" 
+                                        value="${student.uid}">
+                                    <label class="form-check-label" for="faculty2_${student.uid}">
+                                        ${student.sname} (${student.sid})
+                                    </label>
+                                </div>
+                            </li>`;
+
+                        faculty1Students.append(checkbox1);
+                        faculty2Students.append(checkbox2);
+                    });
+
+                    // Remove any existing event handlers
+                    $(document).off('change', '.student-checkbox');
+
+                    // Add new event handler for checkbox changes
+                    $(document).on('change', '.student-checkbox', function() {
+                        const studentId = $(this).data('student-id');
+                        const facultyNum = $(this).data('faculty');
+                        const isChecked = $(this).prop('checked');
+                        
+                        // Disable/enable the corresponding checkbox in the other faculty tab
+                        const otherFacultyNum = facultyNum === '1' ? '2' : '1';
+                        $(`#faculty${otherFacultyNum}_${studentId}`).prop('disabled', isChecked);
+                    });
+
+                    // Handle tab switching to maintain checkbox states
+                    $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                        const activeTab = $(e.target).attr('id');
+                        const faculty = activeTab === 'faculty1-tab' ? '1' : '2';
+                        const otherFaculty = faculty === '1' ? '2' : '1';
+
+                        // Update disabled states based on selections in the other tab
+                        $(`.student-checkbox[data-faculty="${faculty}"]`).each(function() {
+                            const studentId = $(this).data('student-id');
+                            const isOtherChecked = $(`#faculty${otherFaculty}_${studentId}`).prop('checked');
+                            $(this).prop('disabled', isOtherChecked);
+                        });
+                    });
+                }
+            }
+        });
+    });
+
+    // Update select all function to respect disabled checkboxes
+    function selectAllStudents(e) {
+        e.preventDefault();
+        $('.tab-pane.active .student-checkbox:not(:disabled)').prop('checked', true).trigger('change');
+    }
     </script>
 
 </body>

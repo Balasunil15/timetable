@@ -140,60 +140,55 @@ Route::get('/ftimetable/data', [userController::class, 'getFacultyTimetableData'
 // Add this new route
 Route::post('/student/map', function (Request $request) {
     $subjectCode = $request->input('subjectcode');
-    $facultyId = $request->input('facultyId');
-    $selectedStudents = $request->input('selectedStudents');
-    $cid = session('cid');
+    $faculty1Id = $request->input('faculty1Id'); // Correct key for faculty1Id
+    $faculty2Id = $request->input('faculty2Id'); // Correct key for faculty2Id
+    $faculty1Students = $request->input('faculty1Students', []);
+    $faculty2Students = $request->input('faculty2Students', []);
+    $cid = $request->input('cid');
 
-    // Get subject details from both tables
-    $subjectFromSubjects = DB::table('subjects')
-        ->where('subjectcode', $subjectCode)
-        ->where('cid', $cid)
-        ->first();
+    // Get faculty details
+    $faculty1 = DB::table('faculty')->where('fid', $faculty1Id)->first();
+    $faculty2 = $faculty2Id ? DB::table('faculty')->where('fid', $faculty2Id)->first() : null;
 
-    $subjectFromCourses = DB::table('courses')
-        ->where('subcode', $subjectCode)
-        ->first();
-
-    if (!$subjectFromCourses) {
+    if (!$faculty1) {
         return response()->json([
             'status' => 'error',
-            'message' => 'Subject not found in courses'
+            'message' => 'Faculty 1 not found'
         ]);
     }
 
-    // Get faculty name
-    $faculty = DB::table('faculty')
-        ->where('fid', $facultyId)
-        ->first();
-
-    if (!$faculty) {
+    if ($faculty2Id && !$faculty2) {
         return response()->json([
             'status' => 'error',
-            'message' => 'Faculty not found'
+            'message' => 'Faculty 2 not found'
         ]);
     }
 
     try {
-        // Insert entries for each selected student
-        foreach ($selectedStudents as $studentId) {
-            // Check if mapping already exists
-            $exists = DB::table('attendance_map')
-                ->where('cid', $cid)
-                ->where('sid', $studentId)
-                ->where('subject_code', $subjectCode)
-                ->exists();
+        // Insert entries for faculty1 students
+        foreach ($faculty1Students as $studentId) {
+            DB::table('attendance_map')->insert([
+                'cid' => $cid,
+                'sid' => $studentId,
+                'subject_code' => $subjectCode,
+                'subject_name' => $request->input('subjectname'),
+                'fac_id' => $faculty1Id,
+                'fac_name' => $faculty1->name,
+                'attendance' => json_encode([])
+            ]);
+        }
 
-            if (!$exists) {
-                DB::table('attendance_map')->insert([
-                    'cid' => $cid,
-                    'sid' => $studentId,
-                    'subject_code' => $subjectCode,
-                    'subject_name' => $subjectFromCourses->subname, // Using subname from courses table
-                    'fac_id' => $facultyId,
-                    'fac_name' => $faculty->name,
-                    'attendance' => json_encode([])
-                ]);
-            }
+        // Insert entries for faculty2 students
+        foreach ($faculty2Students as $studentId) {
+            DB::table('attendance_map')->insert([
+                'cid' => $cid,
+                'sid' => $studentId,
+                'subject_code' => $subjectCode,
+                'subject_name' => $request->input('subjectname'),
+                'fac_id' => $faculty2Id,
+                'fac_name' => $faculty2->name,
+                'attendance' => json_encode([])
+            ]);
         }
 
         return response()->json([
