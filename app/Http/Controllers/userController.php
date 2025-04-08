@@ -552,6 +552,16 @@ class userController extends Controller
                 ]);
             }
 
+            // Check if each subject has assigned students
+            foreach ($subjects as $subject) {
+                $hasAssignedStudents = DB::table('attendance_map')
+                    ->where('subject_code', $subject->subjectcode)
+                    ->where('cid', session('cid'))
+                    ->exists();
+                
+                $subject->hasAssignedStudents = $hasAssignedStudents;
+            }
+
             return response()->json([
                 'status' => 'success',
                 'data' => $subjects

@@ -364,6 +364,7 @@
                                     <th class="text-center">Subject Name</th>
                                     <th class="text-center">faculty </th>
                                     <th class="text-center">Students List</th>
+                                    <th class="text-center">Status</th> <!-- Add this column -->
                                 </tr>
                             </thead>
                             <tbody id="studentsTableBody">
@@ -717,6 +718,9 @@
                                         Select Students
                                     </button>
                                 </td>
+                                <td class="text-center" id="status-${subject.subjectcode}">
+                                    ${subject.hasAssignedStudents ? '<span class="badge bg-success">Assigned</span>' : '<span class="badge bg-warning">Not Assigned</span>'}
+                                </td>
                             </tr>
                         `;
                     tableBody.append(row);
@@ -789,6 +793,9 @@
             },
             success: function(response) {
                 if (response.status === 'success') {
+                    // Update the status cell
+                    $(`#status-${subjectCode}`).html('<span class="badge bg-success">Assigned</span>');
+
                     Swal.fire({
                         icon: 'success',
                         title: 'Success',
@@ -1175,6 +1182,121 @@
         e.preventDefault();
         $('.tab-pane.active .student-checkbox:not(:disabled)').prop('checked', true).trigger('change');
     }
+
+    $(document).on('click', '.btn-primary[data-bs-target="#studentsModal"]', function() {
+        const subjectCode = $(this).data('subjectcode');
+        const subjectName = $(this).data('subjectname');
+
+        $('#studentsModal').data('subjectcode', subjectCode);
+        $('#studentsModal').data('subjectname', subjectName);
+        $('#studentsModalLabel').text(`Select Students for ${subjectName} (${subjectCode})`);
+
+        $.ajax({
+            url: "{{ route('students.fetch') }}",
+            type: "GET",
+            data: { subjectcode: subjectCode },
+            success: function(response) {
+                if (response.status === 'success') {
+                    const { students, assignedFaculty } = response.data;
+                    
+                    // Clear existing tabs and content
+                    $('#facultyTabs li:not(:first-child)').remove();
+                    $('#facultyTabsContent .tab-pane:not(:first-child)').remove();
+
+                    // Handle faculty dropdowns based on number of assigned faculty
+                    if (assignedFaculty.length === 1) {
+                        // Single faculty case
+                        const faculty1Dropdown = $('#faculty1Dropdown');
+                        faculty1Dropdown.empty().append(
+                            `<option value="${assignedFaculty[0].fid}">${assignedFaculty[0].name}</option>`
+                        );
+                    } else if (assignedFaculty.length === 2) {
+                        // Two faculty case - add second tab and dropdown
+                        $('#facultyTabs').append(`
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="faculty2-tab" data-bs-toggle="tab"
+                                    data-bs-target="#faculty2" type="button" role="tab" aria-controls="faculty2"
+                                    aria-selected="false">Faculty 2</button>
+                            </li>
+                        `);
+
+                        // Add faculty 2 content pane
+                        $('#facultyTabsContent').append(`
+                            <div class="tab-pane fade" id="faculty2" role="tabpanel" aria-labelledby="faculty2-tab">
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label for="faculty2Dropdown" class="form-label">Select Faculty 2:</label>
+                                        <select class="form-select" id="faculty2Dropdown" name="faculty2Dropdown">
+                                            <option value="${assignedFaculty[1].fid}">${assignedFaculty[1].name}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label for="faculty2Students" class="form-label">Select Students:</label>
+                                        <ul class="list-group" id="faculty2Students"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+
+                        // Set faculty dropdowns
+                        $('#faculty1Dropdown').empty().append(
+                            `<option value="${assignedFaculty[0].fid}">${assignedFaculty[0].name}</option>`
+                        );
+                    }
+
+                    // Populate student lists
+                    const faculty1Students = $('#faculty1Students');
+                    faculty1Students.empty();
+
+                    students.forEach(student => {
+                        const checkbox = `
+                            <li class="list-group-item">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input student-checkbox" 
+                                        data-faculty="1"
+                                        data-student-id="${student.uid}"
+                                        id="faculty1_${student.uid}" 
+                                        value="${student.uid}">
+                                    <label class="form-check-label" for="faculty1_${student.uid}">
+                                        ${student.sname} (${student.sid})
+                                    </label>
+                                </div>
+                            </li>`;
+
+                        faculty1Students.append(checkbox);
+                        if (assignedFaculty.length === 2) {
+                            $('#faculty2Students').append(
+                                checkbox.replace(/faculty1/g, 'faculty2').replace(/data-faculty="1"/, 'data-faculty="2"')
+                            );
+                        }
+                    });
+
+                    // Initialize checkbox behavior
+                    initializeCheckboxBehavior(assignedFaculty.length === 2);
+                }
+            }
+        });
+    });
+
+    function initializeCheckboxBehavior(hasTwoFaculty) {
+        // Remove existing handlers
+        $(document).off('change', '.student-checkbox');
+
+        // Add new handler only if there are two faculty
+        if (hasTwoFaculty) {
+            $(document).on('change', '.student-checkbox', function() {
+                const studentId = $(this).data('student-id');
+                const facultyNum = $(this).data('faculty');
+                const isChecked = $(this).prop('checked');
+                
+                // Disable/enable the corresponding checkbox in the other faculty tab
+                const otherFacultyNum = facultyNum === '1' ? '2' : '1';
+                $(`#faculty${otherFacultyNum}_${studentId}`).prop('disabled', isChecked);
+            });
+        }
+    }
     </script>
 
     @php
@@ -1239,11 +1361,7 @@
                                     data-bs-target="#faculty1" type="button" role="tab" aria-controls="faculty1"
                                     aria-selected="true">Faculty 1</button>
                             </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="faculty2-tab" data-bs-toggle="tab"
-                                    data-bs-target="#faculty2" type="button" role="tab" aria-controls="faculty2"
-                                    aria-selected="false">Faculty 2</button>
-                            </li>
+                            <!-- Faculty 2 tab will be added dynamically if needed -->
                         </ul>
                         <div class="tab-content" id="facultyTabsContent">
                             <!-- Faculty 1 Tab -->
@@ -1266,27 +1384,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- Faculty 2 Tab -->
-                            <div class="tab-pane fade" id="faculty2" role="tabpanel" aria-labelledby="faculty2-tab">
-                                <div class="row mb-3">
-                                    <div class="col-md-12">
-                                        <label for="faculty2Dropdown" class="form-label">Select Faculty 2:</label>
-                                        <select class="form-select" id="faculty2Dropdown" name="faculty2Dropdown">
-                                            <option selected disabled>Loading...</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <label for="faculty2Students" class="form-label">Select Students:</label>
-                                        <ul class="list-group" id="faculty2Students">
-                                            <li class="list-group-item text-center">Loading students...</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
+                            <!-- Faculty 2 Tab - will be added dynamically if needed -->
                         </div>
-                        <div class="row mb-3">
+                        <div class="row mb-3 mt-3">
                             <div class="col-md-2">
                                 <button type="button" class="btn btn-outline-primary w-100"
                                     onclick="selectAllStudents(event)">Select All</button>
@@ -1524,132 +1624,64 @@
         $.ajax({
             url: "{{ route('students.fetch') }}",
             type: "GET",
-            data: {
-                subjectcode: subjectCode
-            },
-            success: function(response) {
-                if (response.status === 'success') {
-                    const {
-                        students,
-                        assignedFaculty
-                    } = response.data;
-
-                    // Populate faculty dropdowns
-                    const faculty1Dropdown = $('#faculty1Dropdown');
-                    const faculty2Dropdown = $('#faculty2Dropdown');
-                    faculty1Dropdown.empty();
-                    faculty2Dropdown.empty();
-
-                    if (assignedFaculty.length > 0) {
-                        assignedFaculty.forEach(faculty => {
-                            faculty1Dropdown.append(
-                                `<option value="${faculty.fid}">${faculty.name}</option>`);
-                            faculty2Dropdown.append(
-                                `<option value="${faculty.fid}">${faculty.name}</option>`);
-                        });
-                    }
-
-                    // Populate student lists with checkboxes
-                    const faculty1Students = $('#faculty1Students');
-                    const faculty2Students = $('#faculty2Students');
-                    faculty1Students.empty();
-                    faculty2Students.empty();
-
-                    students.forEach(student => {
-                        const studentCheckbox1 = `
-                        <li class="list-group-item">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input faculty1-checkbox" 
-                                    id="faculty1_student_${student.uid}" 
-                                    value="${student.uid}" 
-                                    data-student-name="${student.sname}">
-                                <label class="form-check-label" for="faculty1_student_${student.uid}">
-                                    ${student.sname} (${student.sid})
-                                </label>
-                            </div>
-                        </li>`;
-
-                        const studentCheckbox2 = `
-                        <li class="list-group-item">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input faculty2-checkbox" 
-                                    id="faculty2_student_${student.uid}" 
-                                    value="${student.uid}" 
-                                    data-student-name="${student.sname}">
-                                <label class="form-check-label" for="faculty2_student_${student.uid}">
-                                    ${student.sname} (${student.sid})
-                                </label>
-                            </div>
-                        </li>`;
-
-                        faculty1Students.append(studentCheckbox1);
-                        faculty2Students.append(studentCheckbox2);
-                    });
-
-                    // Handle checkbox changes for Faculty 1
-                    $('.faculty1-checkbox').on('change', function() {
-                        const studentId = $(this).val();
-                        const isChecked = $(this).prop('checked');
-                        $(`#faculty2_student_${studentId}`).prop('disabled', isChecked);
-                    });
-
-                    // Handle checkbox changes for Faculty 2
-                    $('.faculty2-checkbox').on('change', function() {
-                        const studentId = $(this).val();
-                        const isChecked = $(this).prop('checked');
-                        $(`#faculty1_student_${studentId}`).prop('disabled', isChecked);
-                    });
-
-                    // Update the select all buttons to respect disabled states
-                    $('#selectAllFaculty1').on('click', function() {
-                        $('.faculty1-checkbox:not(:disabled)').prop('checked', true).trigger('change');
-                    });
-
-                    $('#selectAllFaculty2').on('click', function() {
-                        $('.faculty2-checkbox:not(:disabled)').prop('checked', true).trigger('change');
-                    });
-                }
-            }
-        });
-    });
-
-    $(document).on('click', '.btn-primary[data-bs-target="#studentsModal"]', function() {
-        const subjectCode = $(this).data('subjectcode');
-        const subjectName = $(this).data('subjectname');
-
-        $('#studentsModal').data('subjectcode', subjectCode);
-        $('#studentsModal').data('subjectname', subjectName);
-        $('#studentsModalLabel').text(`Select Students for ${subjectName} (${subjectCode})`);
-
-        $.ajax({
-            url: "{{ route('students.fetch') }}",
-            type: "GET",
             data: { subjectcode: subjectCode },
             success: function(response) {
                 if (response.status === 'success') {
                     const { students, assignedFaculty } = response.data;
                     
-                    // Initialize faculty dropdowns
-                    const faculty1Dropdown = $('#faculty1Dropdown');
-                    const faculty2Dropdown = $('#faculty2Dropdown');
-                    faculty1Dropdown.empty();
-                    faculty2Dropdown.empty();
+                    // Clear existing tabs and content
+                    $('#facultyTabs li:not(:first-child)').remove();
+                    $('#facultyTabsContent .tab-pane:not(:first-child)').remove();
 
-                    if (assignedFaculty.length > 0) {
-                        assignedFaculty.forEach(faculty => {
-                            faculty1Dropdown.append(`<option value="${faculty.fid}">${faculty.name}</option>`);
-                            faculty2Dropdown.append(`<option value="${faculty.fid}">${faculty.name}</option>`);
-                        });
+                    // Handle faculty dropdowns based on number of assigned faculty
+                    if (assignedFaculty.length === 1) {
+                        // Single faculty case
+                        const faculty1Dropdown = $('#faculty1Dropdown');
+                        faculty1Dropdown.empty().append(
+                            `<option value="${assignedFaculty[0].fid}">${assignedFaculty[0].name}</option>`
+                        );
+                    } else if (assignedFaculty.length === 2) {
+                        // Two faculty case - add second tab and dropdown
+                        $('#facultyTabs').append(`
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="faculty2-tab" data-bs-toggle="tab"
+                                    data-bs-target="#faculty2" type="button" role="tab" aria-controls="faculty2"
+                                    aria-selected="false">Faculty 2</button>
+                            </li>
+                        `);
+
+                        // Add faculty 2 content pane
+                        $('#facultyTabsContent').append(`
+                            <div class="tab-pane fade" id="faculty2" role="tabpanel" aria-labelledby="faculty2-tab">
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label for="faculty2Dropdown" class="form-label">Select Faculty 2:</label>
+                                        <select class="form-select" id="faculty2Dropdown" name="faculty2Dropdown">
+                                            <option value="${assignedFaculty[1].fid}">${assignedFaculty[1].name}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label for="faculty2Students" class="form-label">Select Students:</label>
+                                        <ul class="list-group" id="faculty2Students"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+
+                        // Set faculty dropdowns
+                        $('#faculty1Dropdown').empty().append(
+                            `<option value="${assignedFaculty[0].fid}">${assignedFaculty[0].name}</option>`
+                        );
                     }
 
                     // Populate student lists
                     const faculty1Students = $('#faculty1Students');
-                    const faculty2Students = $('#faculty2Students');
                     faculty1Students.empty();
-                    faculty2Students.empty();
 
                     students.forEach(student => {
-                        const checkbox1 = `
+                        const checkbox = `
                             <li class="list-group-item">
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input student-checkbox" 
@@ -1663,55 +1695,57 @@
                                 </div>
                             </li>`;
 
-                        const checkbox2 = `
-                            <li class="list-group-item">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input student-checkbox"
-                                        data-faculty="2"
-                                        data-student-id="${student.uid}"
-                                        id="faculty2_${student.uid}" 
-                                        value="${student.uid}">
-                                    <label class="form-check-label" for="faculty2_${student.uid}">
-                                        ${student.sname} (${student.sid})
-                                    </label>
-                                </div>
-                            </li>`;
-
-                        faculty1Students.append(checkbox1);
-                        faculty2Students.append(checkbox2);
+                        faculty1Students.append(checkbox);
+                        if (assignedFaculty.length === 2) {
+                            $('#faculty2Students').append(
+                                checkbox.replace(/faculty1_/g, 'faculty2_')
+                                       .replace(/data-faculty="1"/, 'data-faculty="2"')
+                            );
+                        }
                     });
 
-                    // Remove any existing event handlers
-                    $(document).off('change', '.student-checkbox');
-
-                    // Add new event handler for checkbox changes
-                    $(document).on('change', '.student-checkbox', function() {
-                        const studentId = $(this).data('student-id');
-                        const facultyNum = $(this).data('faculty');
-                        const isChecked = $(this).prop('checked');
-                        
-                        // Disable/enable the corresponding checkbox in the other faculty tab
-                        const otherFacultyNum = facultyNum === '1' ? '2' : '1';
-                        $(`#faculty${otherFacultyNum}_${studentId}`).prop('disabled', isChecked);
-                    });
-
-                    // Handle tab switching to maintain checkbox states
-                    $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
-                        const activeTab = $(e.target).attr('id');
-                        const faculty = activeTab === 'faculty1-tab' ? '1' : '2';
-                        const otherFaculty = faculty === '1' ? '2' : '1';
-
-                        // Update disabled states based on selections in the other tab
-                        $(`.student-checkbox[data-faculty="${faculty}"]`).each(function() {
+                    // Initialize checkbox behavior for two faculty case
+                    if (assignedFaculty.length === 2) {
+                        // Handle checkbox changes in Faculty 1 tab
+                        $(document).on('change', '#faculty1Students input[type="checkbox"]', function() {
                             const studentId = $(this).data('student-id');
-                            const isOtherChecked = $(`#faculty${otherFaculty}_${studentId}`).prop('checked');
-                            $(this).prop('disabled', isOtherChecked);
+                            const isChecked = $(this).prop('checked');
+                            $(`#faculty2_${studentId}`).prop('disabled', isChecked);
                         });
-                    });
+
+                        // Handle checkbox changes in Faculty 2 tab
+                        $(document).on('change', '#faculty2Students input[type="checkbox"]', function() {
+                            const studentId = $(this).data('student-id');
+                            const isChecked = $(this).prop('checked');
+                            $(`#faculty1_${studentId}`).prop('disabled', isChecked);
+                        });
+
+                        // Update checkbox states when switching tabs
+                        $('#facultyTabs button[data-bs-toggle="tab"]').on('shown.bs.tab', function() {
+                            updateCrossTabDisabling();
+                        });
+                    }
                 }
             }
         });
     });
+
+    // Add this new function to handle cross-tab checkbox state updates
+    function updateCrossTabDisabling() {
+        // Update Faculty 2 checkboxes based on Faculty 1 selections
+        $('#faculty1Students input[type="checkbox"]').each(function() {
+            const studentId = $(this).data('student-id');
+            const isChecked = $(this).prop('checked');
+            $(`#faculty2_${studentId}`).prop('disabled', isChecked);
+        });
+
+        // Update Faculty 1 checkboxes based on Faculty 2 selections
+        $('#faculty2Students input[type="checkbox"]').each(function() {
+            const studentId = $(this).data('student-id');
+            const isChecked = $(this).prop('checked');
+            $(`#faculty1_${studentId}`).prop('disabled', isChecked);
+        });
+    }
 
     // Update select all function to respect disabled checkboxes
     function selectAllStudents(e) {
